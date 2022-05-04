@@ -129,7 +129,7 @@ public class MetricsController {
                     Transaction consumerTransaction = createTransaction(TransactionType.FEE, consumer);
 
                     // Calculate cost
-                    BigDecimal price = new BigDecimal(0);
+                    BigDecimal price = BigDecimal.ZERO;
                     for (EntryPoint entryPoint : service.getEntryPoints()) {
                         if (entryPoint.getPathPattern() != null && entryPoint.getHttpMethod() != null) {
 
@@ -165,7 +165,6 @@ public class MetricsController {
 
     // This method adds additional information and stores all the transaction details
     private void addTransactionDetails(Transaction transactionDetails, BigDecimal price) {
-
         transactionDetails.setAmount(price.doubleValue());
 
         transactionRepository.save(transactionDetails);

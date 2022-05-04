@@ -48,7 +48,7 @@ public class CreditAccount {
     protected Long id;
 
     @Column(nullable = false)
-    protected BigDecimal balance = new BigDecimal(0);
+    protected BigDecimal balance = BigDecimal.ZERO;
 
     @JsonIgnore
     @OneToOne(mappedBy = "account", optional = false)

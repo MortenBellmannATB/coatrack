@@ -277,12 +277,12 @@ public class ReportController {
             }
             // Sums all calls for the Other calls if they exist
             if (noOfCallsThatDoNotMatchEntryPoints.get() > 0L) {
-                ApiUsageReport apiUsageReport = new ApiUsageReport("Other Calls", noOfCallsThatDoNotMatchEntryPoints.longValue(), new BigDecimal(0).doubleValue(), new BigDecimal(0).doubleValue());
+                ApiUsageReport apiUsageReport = new ApiUsageReport("Other Calls", noOfCallsThatDoNotMatchEntryPoints.longValue(), BigDecimal.ZERO.doubleValue(), BigDecimal.ZERO.doubleValue());
                 result.add(apiUsageReport);
             }
             // Sums all calls for free services, if any
             if (noOfCallsToFreeService.get() > 0L) {
-                ApiUsageReport apiUsageReportForFreeServices = new ApiUsageReport("All Calls", noOfCallsToFreeService.longValue(), new BigDecimal(0).doubleValue(), new BigDecimal(0).doubleValue());
+                ApiUsageReport apiUsageReportForFreeServices = new ApiUsageReport("All Calls", noOfCallsToFreeService.longValue(), BigDecimal.ZERO.doubleValue(), BigDecimal.ZERO.doubleValue());
                 result.add(apiUsageReportForFreeServices);
             }
             // Sums all calls for montly flatrate services, if any
