@@ -136,17 +136,16 @@ public class MetricsController {
                             boolean pathsMatches = parser.match(entryPoint.getPathPattern(), metricSubmitted.getPath());
 
                             if (pathsMatches) {
-                                if (entryPoint.getHttpMethod().equals(metricSubmitted.getRequestMethod()) && !entryPoint.getHttpMethod().equals("*")
-                                        || entryPoint.getHttpMethod().equals("*")) {
-                                    price = price.add(new BigDecimal(entryPoint.getPricePerCall() / 1000));
+                                if (entryPoint.getHttpMethod().equals(metricSubmitted.getRequestMethod()) || entryPoint.getHttpMethod().equals("*")) {
+                                    price = price.add(BigDecimal.valueOf(entryPoint.getPricePerCall() / 1000));
 
                                     addTransactionDetails(consumerTransaction, price);
                                     addTransactionDetails(providerTransaction, price);
 
                                     log.debug("Transferring {} EUR from {} to {}",price.doubleValue(),consumer.getUsername(),provider.getUsername());
 
-                                    consumer.getAccount().setBalance(consumer.getAccount().getBalance() - price.doubleValue());
-                                    provider.getAccount().setBalance(provider.getAccount().getBalance() + price.doubleValue());
+                                    consumer.getAccount().setBalance(consumer.getAccount().getBalance().subtract(price));
+                                    provider.getAccount().setBalance(provider.getAccount().getBalance().add(price));
 
                                 }
                             }

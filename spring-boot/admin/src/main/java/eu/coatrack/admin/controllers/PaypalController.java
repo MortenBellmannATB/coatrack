@@ -28,6 +28,8 @@ import com.paypal.api.payments.RedirectUrls;
 import com.paypal.api.payments.Transaction;
 import com.paypal.base.rest.APIContext;
 import com.paypal.base.rest.PayPalRESTException;
+
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -84,8 +86,8 @@ public class PaypalController {
 
         User user = userRepository.findByUsername(authentication.getName());
 
-        double actual = user.getAccount().getBalance();
-        user.getAccount().setBalance(actual + 5);
+        BigDecimal actual = user.getAccount().getBalance();
+        user.getAccount().setBalance(actual.add(BigDecimal.valueOf(5)));
 
         return "redirect:/admin/profiles";
     }

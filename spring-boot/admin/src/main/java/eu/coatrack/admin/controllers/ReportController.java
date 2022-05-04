@@ -36,6 +36,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -229,8 +230,6 @@ public class ReportController {
                 Long noCalls = (Long) item[3];
                 String path = (String) item[4];
                 String requestMethod = (String) item[5];
-                BigDecimal price = new BigDecimal(0);
-                BigDecimal priceUnit = new BigDecimal(0);
 
                 log.debug("Metric for report: user '{}' service '{}' type '{}' calls '{}' path '{}' method '{}'",
                         username, serviceId, metricType, noCalls, path, requestMethod);
@@ -251,8 +250,7 @@ public class ReportController {
                                 boolean pathMatches = parser.match(entryPoint.getPathPattern(), path);
 
                                 if (pathMatches) {
-                                    if (entryPoint.getHttpMethod().equals(requestMethod) && !entryPoint.getHttpMethod().equals("*")
-                                            || entryPoint.getHttpMethod().equals("*")) {
+                                    if (entryPoint.getHttpMethod().equals(requestMethod) || entryPoint.getHttpMethod().equals("*")) {
 
                                         noOfCallsPerEntryPoint.get(entryPoint).addAndGet(noCalls);
                                         anEntryPointWasMatched = true;
@@ -271,8 +269,10 @@ public class ReportController {
             if (!noOfCallsPerEntryPoint.isEmpty()) {
                 for (EntryPoint entryPoint : serviceApi.getEntryPoints())
                 {
-                    ApiUsageReport apiUsageReport = new ApiUsageReport(entryPoint.getName() + " (" + entryPoint.getHttpMethod() + " " + entryPoint.getPathPattern() + ")", noOfCallsPerEntryPoint.get(entryPoint).longValue(), new BigDecimal(entryPoint.getPricePerCall()).doubleValue(), new BigDecimal(entryPoint.getPricePerCall() * noOfCallsPerEntryPoint.get(entryPoint).longValue() / 1000).doubleValue());
-                    result.add(apiUsageReport);
+                    String name = String.format("%s (%s %s)", entryPoint.getName(), entryPoint.getHttpMethod(), entryPoint.getPathPattern());
+                    double total = BigDecimal.valueOf(entryPoint.getPricePerCall() * noOfCallsPerEntryPoint.get(entryPoint).longValue() / 1000).setScale(2, RoundingMode.DOWN) .doubleValue();
+
+                    result.add(new ApiUsageReport(name, noOfCallsPerEntryPoint.get(entryPoint).longValue(), BigDecimal.valueOf(entryPoint.getPricePerCall()).doubleValue(), total));
                 }
             }
             // Sums all calls for the Other calls if they exist

@@ -20,6 +20,7 @@ package eu.coatrack.admin.controllers;
  * #L%
  */
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -105,7 +106,7 @@ public class CreditAccountController {
         double amountResult = amount.getAmount() - commisionFix - (amount.getAmount() * commisionVariable / 100);
         double balanceResult = amount.getAmount() + commisionFix + (amount.getAmount() * commisionVariable / 100);
 
-        user.getAccount().setBalance(user.getAccount().getBalance() - balanceResult);
+        user.getAccount().setBalance(user.getAccount().getBalance().subtract(BigDecimal.valueOf(balanceResult)));
         creditAccountRepository.save(user.getAccount());
 
         // Send communication

@@ -372,7 +372,7 @@ public class AdminController {
             }
 
             DoughnutDataset dataset = new DoughnutDataset().setLabel("HTTP response codes")
-                    .addBackgroundColors(chartColors.stream().toArray(Color[]::new)).setBorderWidth(2);
+                    .addBackgroundColors(chartColors.toArray(new Color[0])).setBorderWidth(2);
             statisticsPerHttpStatusCodeList.forEach(stats -> dataset.addData(stats.getNoOfCalls()));
             DoughnutData data = new DoughnutData().addDataset(dataset);
             statisticsPerHttpStatusCodeList.forEach(stats -> data.addLabel(stats.getStatusCode().toString()));
@@ -397,7 +397,7 @@ public class AdminController {
         long timePeriodDurationInDays = ChronoUnit.DAYS.between(selectedTimePeriodStart, selectedTimePeriodEnd);
         for (int i = 0; i <= timePeriodDurationInDays; i++) {
             // put "0" as default, in case no calls are registered in database
-            callsPerDay.put(selectedTimePeriodStart.plusDays(i), 0l);
+            callsPerDay.put(selectedTimePeriodStart.plusDays(i), 0L);
         }
 
         // add numbers from database, if any
@@ -518,7 +518,7 @@ public class AdminController {
             serviceApi.setServiceAccessPaymentPolicy(ServiceAccessPaymentPolicy.FOR_FREE);
         } else if (wizard.getMonthlyCharge()) {
             serviceApi.setServiceAccessPaymentPolicy(ServiceAccessPaymentPolicy.MONTHLY_FEE);
-            serviceApi.setMonthlyFee(Double.valueOf(wizard.getServiceCost()));
+            serviceApi.setMonthlyFee(Double.parseDouble(wizard.getServiceCost()));
         } else {
             serviceApi.setServiceAccessPaymentPolicy(ServiceAccessPaymentPolicy.WELL_DEFINED_PRICE);
 
@@ -528,7 +528,7 @@ public class AdminController {
             entryPoint.setHttpMethod("GET");
             entryPoint.setName("/");
             entryPoint.setPathPattern("/");
-            entryPoint.setPricePerCall(Double.valueOf(wizard.getServiceCost()));
+            entryPoint.setPricePerCall(Double.parseDouble(wizard.getServiceCost()));
 
             entryPoints.add(entryPoint);
             serviceApi.setEntryPoints(entryPoints);

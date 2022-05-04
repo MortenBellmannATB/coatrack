@@ -21,6 +21,8 @@ package eu.coatrack.api;
  */
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
@@ -46,7 +48,7 @@ public class CreditAccount {
     protected Long id;
 
     @Column(nullable = false)
-    protected double balance = 0;
+    protected BigDecimal balance = new BigDecimal(0);
 
     @JsonIgnore
     @OneToOne(mappedBy = "account", optional = false)
@@ -90,11 +92,11 @@ public class CreditAccount {
         this.transaction = transaction;
     }
 
-    public double getBalance() {
+    public BigDecimal getBalance() {
         return balance;
     }
 
-    public void setBalance(double balance) {
+    public void setBalance(BigDecimal balance) {
         this.balance = balance;
     }
 

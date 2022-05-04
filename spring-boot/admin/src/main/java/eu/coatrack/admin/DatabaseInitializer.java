@@ -99,8 +99,8 @@ public class DatabaseInitializer {
                     "http://192.168.55.14:8086/weather-info",
                     ServiceAccessPermissionPolicy.PUBLIC,
                     ServiceAccessPaymentPolicy.WELL_DEFINED_PRICE,
-                    new BigDecimal(2.0),
-                    new BigDecimal(15.9),
+                    new BigDecimal("2.0"),
+                    new BigDecimal("15.9"),
                     "Service for customers to get information about the weather in a specific location. Define the location via request parameters 'lat' and 'long' (mandatory).");
 
 
@@ -554,7 +554,7 @@ public class DatabaseInitializer {
 
     private void createNewCreditAccount(double balance, User user) {
         CreditAccount creditAccount = new CreditAccount();
-        creditAccount.setBalance(balance);
+        creditAccount.setBalance(BigDecimal.valueOf(balance));
         creditAccount.setUser(user);
         creditAccountRepository.save(creditAccount);
         user.setAccount(creditAccount);
