@@ -23,6 +23,7 @@ package eu.coatrack.admin.controllers;
 import eu.coatrack.admin.logic.CreateApiKeyAction;
 import eu.coatrack.admin.model.repository.ServiceApiRepository;
 import eu.coatrack.admin.model.repository.UserRepository;
+import eu.coatrack.admin.service.PublicApiService;
 import eu.coatrack.api.*;
 
 import io.swagger.annotations.ApiOperation;
@@ -52,46 +53,23 @@ import static org.modelmapper.convention.MatchingStrategies.STRICT;
 @RequestMapping(value = "/public-api")
 @Component
 @CrossOrigin(origins = "*", methods = {RequestMethod.GET, RequestMethod.POST})
-public class PublicApiController implements InitializingBean {
-
-    private static final Logger log = LoggerFactory.getLogger(PublicApiController.class);
-
-    @Value("${ygg.admin.server.url}")
-    private String coatrackAdminPublicServerURL;
+public class PublicApiController {
 
     @Autowired
-    private ServiceApiRepository serviceApiRepository;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private CreateApiKeyAction createApiKeyAction;
-
-    @Autowired
-    private ReportController reportController;
-
-    private ModelMapper modelMapper;
-
-    public void afterPropertiesSet() throws Exception {
-        modelMapper = new ModelMapper();
-        modelMapper.getConfiguration().setMatchingStrategy(STRICT);
-        modelMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
-    }
+    private PublicApiService publicApiService;
 
     @GetMapping(value = "/services/{serviceOwnerUsername}/{uriIdentifier}", produces = "application/json")
     @ApiOperation(value = "Get specific service by owner and URI Identifier",
             notes = "<b> uriIdentifier </b> - the URI identifier that is used in CoatRack to identify the service\n" +
                     "<b> serviceOwnerUsername </b> - this is the Github username of the one who owns and offers the service via Coatrack\n")
     public ServiceApiDTO findByServiceOwnerAndUriIdentifier(@PathVariable("uriIdentifier") String uriIdentifier, @PathVariable("serviceOwnerUsername") String serviceOwnerUsername) {
-        return toDTO(serviceApiRepository.findServiceApiByServiceOwnerAndUriIdentifier(serviceOwnerUsername, uriIdentifier));
+        return publicApiService.findByServiceOwnerAndUriIdentifier(serviceOwnerUsername, uriIdentifier);
     }
 
     @GetMapping(value = "/services", produces = "application/json")
     @ApiOperation(value = "Get a list of all services offered by the currently logged in user")
     public List<ServiceApiDTO> findByServiceOwner() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        return toListOfDTOs(serviceApiRepository.findByOwnerUsername(auth.getName()));
+        return publicApiService.findByServiceOwner();
     }
 
     @PostMapping(value = "services/{serviceOwnerUsername}/{uriIdentifier}/subscriptions", produces = "text/plain")
@@ -99,14 +77,7 @@ public class PublicApiController implements InitializingBean {
             notes = "<b> uriIdentifier </b> - the URI identifier that is used in CoatRack to identify the service\n" +
                     "<b> serviceOwnerUsername </b> - this is the Github username of the one who owns and offers the service via Coatrack\n")
     public String subscribeToService(@PathVariable("uriIdentifier") String uriIdentifier, @PathVariable("serviceOwnerUsername") String serviceOwnerUsername) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User userWhoSubscribes = userRepository.findByUsername(auth.getName());
-        ServiceApi serviceToSubscribeTo = serviceApiRepository.findServiceApiByServiceOwnerAndUriIdentifier(serviceOwnerUsername, uriIdentifier);
-        createApiKeyAction.setServiceApi(serviceToSubscribeTo);
-        createApiKeyAction.setUser(userWhoSubscribes);
-        createApiKeyAction.execute();
-        String baseURL = coatrackAdminPublicServerURL + "/admin/api-keys/consumer/list";
-        return baseURL;
+        return publicApiService.subscribeToService(uriIdentifier, serviceOwnerUsername);
     }
 
     @GetMapping(value = "services/{serviceOwnerUsername}/{uriIdentifier}/usageStatistics")
@@ -115,49 +86,12 @@ public class PublicApiController implements InitializingBean {
                     "<b> serviceOwnerUsername </b> - this is the Github username of the one who owns and offers the service via Coatrack\n" +
                     "<b> dateFrom and dateUntil </b> - these dates define the time interval to filter the usage statistics\n" +
                     "the dates should be written in the format YYYY-MM-DD\n")
-
-    public ServiceUsageStatisticsDTO getServiceUsageStatistics(@PathVariable("uriIdentifier") String uriIdentifier, @PathVariable("serviceOwnerUsername") String serviceOwnerUsername, @RequestParam String dateFrom, @RequestParam String dateUntil) throws IOException, ParseException {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        ServiceApi service = serviceApiRepository.findServiceApiByServiceOwnerAndUriIdentifier(serviceOwnerUsername, uriIdentifier);
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        Date dateFromParsedToDate = formatter.parse(dateFrom);
-        Date dateUntilParsedToDate = formatter.parse(dateUntil);
-        List<ApiUsageReport> apiUsageReports = new ArrayList<>();
-        // if user is the owner of the service
-        if (serviceOwnerUsername.equals(auth.getName())) {
-
-            apiUsageReports.addAll(reportController.calculateApiUsageReportForSpecificService(service, -1L, // for all consumers
-                    java.sql.Date.valueOf(dateFromParsedToDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()),
-                    java.sql.Date.valueOf(dateUntilParsedToDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()),
-                    true));
-        } else {
-            Long userId = userRepository.findByUsername(auth.getName()).getId();
-            apiUsageReports = reportController.calculateApiUsageReportForSpecificService(service, userId, dateFromParsedToDate, dateUntilParsedToDate, false);
-        }
-
-        ServiceUsageStatisticsDTO serviceUsageStatisticsDTO = new ServiceUsageStatisticsDTO();
-        serviceUsageStatisticsDTO.setNumberOfCalls(apiUsageReports.stream().mapToLong(ApiUsageReport::getCalls).sum());
-        serviceUsageStatisticsDTO.setDateFrom(dateFrom);
-        serviceUsageStatisticsDTO.setDateUntil(dateUntil);
-        serviceUsageStatisticsDTO.setUriIdentifier(uriIdentifier);
-        serviceUsageStatisticsDTO.setOwnerUserName(service.getOwner().getUsername());
-
-        return serviceUsageStatisticsDTO;
+    public ServiceUsageStatisticsDTO getServiceUsageStatistics(
+            @PathVariable("uriIdentifier") String uriIdentifier,
+            @PathVariable("serviceOwnerUsername") String serviceOwnerUsername,
+            @RequestParam String dateFrom,
+            @RequestParam String dateUntil) throws ParseException {
+        return publicApiService.getServiceUsageStatistics(uriIdentifier, serviceOwnerUsername, dateFrom, dateUntil);
     }
 
-    List<ServiceApiDTO> toListOfDTOs(List<ServiceApi> entity) {
-
-        List<ServiceApiDTO> serviceApiDTOList = new ArrayList<>();
-
-        for (ServiceApi singleEntity : entity) {
-            serviceApiDTOList.add(modelMapper.map(singleEntity, ServiceApiDTO.class));
-        }
-        return serviceApiDTOList;
-    }
-
-    ServiceApiDTO toDTO(ServiceApi entity) {
-        ServiceApiDTO serviceDTO = modelMapper.map(entity, ServiceApiDTO.class);
-        serviceDTO.setServiceOwnerUsername(entity.getOwner().getUsername());
-        return serviceDTO;
-    }
 }
