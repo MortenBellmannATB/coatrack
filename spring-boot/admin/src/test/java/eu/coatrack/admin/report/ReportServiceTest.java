@@ -8,8 +8,8 @@ import eu.coatrack.api.ApiUsageReport;
 import eu.coatrack.api.DataTableView;
 import org.junit.jupiter.api.Test;
 import java.util.Date;
-import static eu.coatrack.admin.datafactories.ReportDataFactory.*;
-import static eu.coatrack.admin.utils.DateUtils.getTodayMinusOneMonthAsString;
+import static eu.coatrack.admin.report.ReportDataFactory.*;
+import static eu.coatrack.admin.utils.DateUtils.getTodayLastMonthAsString;
 import static eu.coatrack.api.ServiceAccessPaymentPolicy.WELL_DEFINED_PRICE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -36,7 +36,7 @@ public class ReportServiceTest {
 
     @Test
     public void reportApiUsage() {
-        ApiUsageDTO apiUsageDTO = getApiUsageDTO(getTodayMinusOneMonthAsString(), WELL_DEFINED_PRICE);
+        ApiUsageDTO apiUsageDTO = getApiUsageDTO(getTodayLastMonthAsString(), WELL_DEFINED_PRICE);
         DataTableView<ApiUsageReport> tableView = reportService.reportApiUsage(apiUsageDTO);
 
         assertEquals(3, tableView.getData().size());

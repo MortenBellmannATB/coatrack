@@ -1,4 +1,4 @@
-package eu.coatrack.admin.datafactories;
+package eu.coatrack.admin.report;
 
 import eu.coatrack.admin.service.report.ApiUsageDTO;
 import eu.coatrack.admin.service.report.CallCount;

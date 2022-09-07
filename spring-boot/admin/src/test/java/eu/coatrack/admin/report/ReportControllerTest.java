@@ -17,7 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.Collections;
 import java.util.Optional;
-import static eu.coatrack.admin.datafactories.ReportDataFactory.*;
+import static eu.coatrack.admin.report.ReportDataFactory.*;
 import static eu.coatrack.admin.utils.DateUtils.*;
 import static org.exparity.hamcrest.date.DateMatchers.sameDay;
 import static org.hamcrest.Matchers.is;
@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ContextConfiguration(classes = TestConfiguration.class)
-@WebMvcTest(value = ReportController.class)
+@WebMvcTest(ReportController.class)
 public class ReportControllerTest {
 
     private final ReportController reportController;
@@ -92,7 +92,7 @@ public class ReportControllerTest {
 
         String query = String.format("%s/%s/%s/%d/%d/%b",
                 basePath,
-                getTodayMinusOneMonthAsString(),
+                getTodayLastMonthAsString(),
                 getTodayAsString(),
                 selectedServiceId,
                 selectedApiConsumerUserId,
@@ -111,7 +111,7 @@ public class ReportControllerTest {
                 .andExpect(model().attribute("exportUser", is(consumer)))
                 .andExpect(model().attribute("isOnlyPaidCalls", false)) // TODO delete
                 .andExpect(model().attribute("isReportForConsumer", false)) // TODO delete
-                .andExpect(model().attribute("dateFrom", sameDay(parseDateStringOrGetTodayIfNull(getTodayMinusOneMonthAsString())))) // TODO delete
+                .andExpect(model().attribute("dateFrom", sameDay(parseDateStringOrGetTodayIfNull(getTodayLastMonthAsString())))) // TODO delete
                 .andExpect(model().attribute("dateUntil", sameDay(getToday()))) // TODO delete
                 .andExpect(model().attribute("serviceApiSelectedForReport", is(nullValue()))) // TODO delete
                 .andExpect(model().attribute("consumerUserSelectedForReport", is(nullValue()))); // TODO delete
@@ -149,7 +149,7 @@ public class ReportControllerTest {
 
         String query = String.format("%s/consumer/%s/%s/%d/%b",
                 basePath,
-                getTodayMinusOneMonthAsString(),
+                getTodayLastMonthAsString(),
                 getTodayAsString(),
                 selectedServiceId,
                 considerOnlyPaidCalls
@@ -166,7 +166,7 @@ public class ReportControllerTest {
                 .andExpect(model().attribute("users", consumers))
                 .andExpect(model().attribute("isOnlyPaidCalls", false)) // TODO to delete
                 .andExpect(model().attribute("isReportForConsumer", false)) // TODO to delete
-                .andExpect(model().attribute("dateFrom", sameDay(parseDateStringOrGetTodayIfNull(getTodayMinusOneMonthAsString())))) // TODO delete
+                .andExpect(model().attribute("dateFrom", sameDay(parseDateStringOrGetTodayIfNull(getTodayLastMonthAsString())))) // TODO delete
                 .andExpect(model().attribute("dateUntil", sameDay(getToday()))) // TODO delete
                 .andExpect(model().attribute("serviceApiSelectedForReport", is(serviceApis.get(0)))); // TODO delete
     }

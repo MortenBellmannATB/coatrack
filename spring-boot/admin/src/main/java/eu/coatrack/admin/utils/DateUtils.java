@@ -29,6 +29,15 @@ public class DateUtils {
         return today.getTime();
     }
 
+    public static Date getTodayLastMonth() {
+        Calendar today = Calendar.getInstance();
+        today.set(Calendar.HOUR_OF_DAY, 0);
+        today.set(Calendar.MINUTE, 0);
+        today.set(Calendar.SECOND, 0);
+        today.add(Calendar.MONTH, -1);
+        return today.getTime();
+    }
+
     public static String getTodayAsString() {
         Calendar today = Calendar.getInstance();
         int month = today.get(Calendar.MONTH)+1;
@@ -38,7 +47,7 @@ public class DateUtils {
                 today.get(Calendar.YEAR), monthString, today.get(Calendar.DAY_OF_MONTH));
     }
 
-    public static String getTodayMinusOneMonthAsString() {
+    public static String getTodayLastMonthAsString() {
         Calendar today = Calendar.getInstance();
         int month = today.get(Calendar.MONTH);
         String zeroPrefix = month < 10 ? "0" : "";

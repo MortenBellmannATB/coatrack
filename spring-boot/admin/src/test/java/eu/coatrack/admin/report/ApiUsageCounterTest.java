@@ -1,6 +1,5 @@
 package eu.coatrack.admin.report;
 
-import eu.coatrack.admin.datafactories.ReportDataFactory;
 import eu.coatrack.admin.model.repository.MetricsAggregationCustomRepository;
 import eu.coatrack.admin.service.report.ApiUsageCounter;
 import eu.coatrack.admin.service.report.ApiUsageDTO;
@@ -8,8 +7,8 @@ import eu.coatrack.admin.service.report.CallCount;
 import eu.coatrack.api.MetricType;
 import org.junit.jupiter.api.Test;
 import java.util.*;
-import static eu.coatrack.admin.datafactories.ReportDataFactory.*;
-import static eu.coatrack.admin.utils.DateUtils.getTodayMinusOneMonthAsString;
+import static eu.coatrack.admin.report.ReportDataFactory.*;
+import static eu.coatrack.admin.utils.DateUtils.getTodayLastMonthAsString;
 import static eu.coatrack.api.ServiceAccessPaymentPolicy.MONTHLY_FEE;
 import static eu.coatrack.api.ServiceAccessPaymentPolicy.WELL_DEFINED_PRICE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -39,7 +38,7 @@ public class ApiUsageCounterTest {
 
     @Test
     public void countMonthly() {
-        ApiUsageDTO apiUsageDTO = ReportDataFactory.getApiUsageDTO(getTodayMinusOneMonthAsString(), MONTHLY_FEE);
+        ApiUsageDTO apiUsageDTO = ReportDataFactory.getApiUsageDTO(getTodayLastMonthAsString(), MONTHLY_FEE);
         CallCount result = apiUsageCounter.count(apiUsageDTO);
 
         assertFalse(result.isEmpty());
@@ -48,7 +47,7 @@ public class ApiUsageCounterTest {
 
     @Test
     public void countEntryPoint() {
-        ApiUsageDTO apiUsageDTO = getApiUsageDTO(getTodayMinusOneMonthAsString(), WELL_DEFINED_PRICE);
+        ApiUsageDTO apiUsageDTO = getApiUsageDTO(getTodayLastMonthAsString(), WELL_DEFINED_PRICE);
         CallCount result = apiUsageCounter.count(apiUsageDTO);
 
         assertFalse(result.isEmpty());
