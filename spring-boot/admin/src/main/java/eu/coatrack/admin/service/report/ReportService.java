@@ -6,14 +6,14 @@ import lombok.AllArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-
+import static eu.coatrack.admin.utils.DateUtils.getDateFromString;
 import static eu.coatrack.api.ServiceAccessPaymentPolicy.WELL_DEFINED_PRICE;
 
 
@@ -57,24 +57,7 @@ public class ReportService {
         return total;
     }
 
-
-    // TODO remove after refactoring PublicApiController
-    @Deprecated
-    public List<ApiUsageReport> calculateApiUsageReportForSpecificService(ServiceApi service, long consumerId, Date from, Date until, boolean considerOnlyPaidCalls) {
-        ApiUsageDTO apiUsageDTO = new ApiUsageDTO(
-                service,
-                null,
-                from,
-                until,
-                considerOnlyPaidCalls,
-                false
-        );
-        return calculateApiUsageReportForSpecificService(apiUsageDTO);
-    }
-
-    // TODO remove after refactoring PublicApiController
-    @Deprecated
-    private List<ApiUsageReport> calculateApiUsageReportForSpecificService(ApiUsageDTO apiUsageDTO) {
+    public List<ApiUsageReport> calculateApiUsageReportForSpecificService(ApiUsageDTO apiUsageDTO) {
         return apiUsageCalculator.calculateForSpecificService(apiUsageDTO);
     }
 
@@ -119,5 +102,34 @@ public class ReportService {
                 .map(ApiKey::getUser)
                 .distinct()
                 .collect(Collectors.toList());
+    }
+
+    public ServiceUsageStatisticsDTO getServiceUsageStatistics(
+            String uriIdentifier, String serviceOwnerUsername, String dateFromString, String dateUntilString, User consumer) {
+
+        String authenticatedUserName = SecurityContextHolder.getContext().getAuthentication().getName();
+        ServiceApi service = serviceApiRepository.findServiceApiByServiceOwnerAndUriIdentifier(serviceOwnerUsername, uriIdentifier);
+        Date from = getDateFromString(dateFromString);
+        Date until = getDateFromString(dateUntilString);
+
+        ApiUsageDTO apiUsageDTO = new ApiUsageDTO(service, null, from, until, true, false);
+
+        if (!serviceOwnerUsername.equals(authenticatedUserName)) {
+            apiUsageDTO.setConsumer(consumer);
+        }
+
+        List<ApiUsageReport> apiUsageReports = calculateApiUsageReportForSpecificService(apiUsageDTO);
+
+        long numberOfCalls = apiUsageReports.stream().mapToLong(ApiUsageReport::getCalls).sum();
+
+        ServiceUsageStatisticsDTO serviceUsageStatisticsDTO = new ServiceUsageStatisticsDTO(
+                numberOfCalls,
+                dateFromString,
+                dateUntilString,
+                uriIdentifier,
+                service.getOwner().getUsername()
+        );
+
+        return serviceUsageStatisticsDTO;
     }
 }
