@@ -2,7 +2,10 @@ package eu.coatrack.admin.publicapi;
 
 import eu.coatrack.admin.config.TestConfiguration;
 import eu.coatrack.admin.controllers.PublicApiController;
+import eu.coatrack.admin.model.repository.ServiceApiRepository;
+import eu.coatrack.admin.model.repository.UserRepository;
 import eu.coatrack.admin.service.PublicApiService;
+import eu.coatrack.admin.service.report.ReportService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -32,6 +35,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class PublicApiControllerTest {
 
     private final PublicApiController publicApiController;
+    private final ReportService reportService;
+    private final UserRepository userRepository;
+    private final ServiceApiRepository serviceApiRepository;
 
     private final PublicApiService publicApiService;
     private final MockMvc mvc;
@@ -40,8 +46,11 @@ public class PublicApiControllerTest {
 
     public PublicApiControllerTest() {
         publicApiService = mock(PublicApiService.class);
+        reportService = mock(ReportService.class);
+        userRepository = mock(UserRepository.class);
+        serviceApiRepository = mock(ServiceApiRepository.class);
 
-        publicApiController = new PublicApiController(publicApiService);
+        publicApiController = new PublicApiController(publicApiService, reportService, userRepository, serviceApiRepository);
 
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ADMIN");
         Authentication authentication = new UsernamePasswordAuthenticationToken(consumer.getUsername(), "PetesPassword", Collections.singletonList(authority));
@@ -83,7 +92,7 @@ public class PublicApiControllerTest {
 
         mvc.perform(post(query))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType("text/plain"))
+                .andExpect(content().contentType("text/plain;charset=ISO-8859-1"))
                 .andDo(print());
     }
 
