@@ -5,6 +5,7 @@ import eu.coatrack.admin.controllers.PublicApiController;
 import eu.coatrack.admin.model.repository.ServiceApiRepository;
 import eu.coatrack.admin.model.repository.UserRepository;
 import eu.coatrack.admin.service.PublicApiService;
+import eu.coatrack.admin.service.ServiceApiService;
 import eu.coatrack.admin.service.report.ReportService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -37,7 +38,7 @@ public class PublicApiControllerTest {
     private final PublicApiController publicApiController;
     private final ReportService reportService;
     private final UserRepository userRepository;
-    private final ServiceApiRepository serviceApiRepository;
+    private final ServiceApiService serviceApiService;
 
     private final PublicApiService publicApiService;
     private final MockMvc mvc;
@@ -48,9 +49,9 @@ public class PublicApiControllerTest {
         publicApiService = mock(PublicApiService.class);
         reportService = mock(ReportService.class);
         userRepository = mock(UserRepository.class);
-        serviceApiRepository = mock(ServiceApiRepository.class);
+        serviceApiService = mock(ServiceApiService.class);
 
-        publicApiController = new PublicApiController(publicApiService, reportService, userRepository, serviceApiRepository);
+        publicApiController = new PublicApiController(publicApiService, serviceApiService, reportService, userRepository);
 
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ADMIN");
         Authentication authentication = new UsernamePasswordAuthenticationToken(consumer.getUsername(), "PetesPassword", Collections.singletonList(authority));
