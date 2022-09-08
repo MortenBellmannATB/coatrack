@@ -12,9 +12,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
+
 import static eu.coatrack.admin.utils.DateUtils.getDateFromString;
-import static eu.coatrack.api.ServiceAccessPaymentPolicy.WELL_DEFINED_PRICE;
 
 
 @Slf4j
@@ -34,8 +33,7 @@ public class ReportService {
         List<ApiUsageReport> apiUsageReports;
 
         if (apiUsageDTO != null && apiUsageDTO.getService() != null) {
-            // TODO replace calculateApiUsageReportForSpecificService(apiUsageDTO) with apiUsageCalculator.calculateForSpecificService(apiUsageDTO);
-            apiUsageReports = calculateApiUsageReportForSpecificService(apiUsageDTO);
+           apiUsageReports = apiUsageCalculator.calculateForSpecificService(apiUsageDTO);
         } else {
             apiUsageReports = new ArrayList<>();
         }
@@ -53,6 +51,7 @@ public class ReportService {
             List<ApiUsageReport> calculatedApiUsage = calculateApiUsageReportForSpecificService(apiUsageDTO);
             apiUsageReportsForAllOfferedServices.addAll(calculatedApiUsage);
         }
+
         double total = apiUsageReportsForAllOfferedServices.stream().mapToDouble(ApiUsageReport::getTotal).sum();
         return total;
     }
@@ -61,16 +60,7 @@ public class ReportService {
         return apiUsageCalculator.calculateForSpecificService(apiUsageDTO);
     }
 
-    @Deprecated
-    public double calculateTotalRevenueForApiProvider(String apiProviderUsername, LocalDate timePeriodStart, LocalDate timePeriodEnd) {
-        Date from = java.sql.Date.valueOf(timePeriodStart);
-        Date until = java.sql.Date.valueOf(timePeriodEnd);
-
-        // TODO move to ServiceApiService after refactoring admin controller, serviceApiRepository can be moved to AdminController
-        List<ServiceApi> offeredServices = serviceApiRepository.findByOwnerUsername(apiProviderUsername);
-        return reportTotalRevenueForApiProvider(offeredServices, from, until);
-    }
-
+    // TODO this has to be changed with AdminController refactoring
     @Deprecated
     public double reportTotalRevenueForApiProvider(String apiProviderUsername, LocalDate timePeriodStart, LocalDate timePeriodEnd) {
         Date from = java.sql.Date.valueOf(timePeriodStart);
@@ -81,28 +71,6 @@ public class ReportService {
         return reportTotalRevenueForApiProvider(offeredServices, from, until);
     }
 
-
-
-    // TODO move to ServiceApiService
-    @Deprecated
-    public List<String> getPayPerCallServicesIds(List<ServiceApi> serviceApis) {
-        List<String> payPerCallServicesIds = new ArrayList<>();
-        if (!serviceApis.isEmpty()) {
-            payPerCallServicesIds = serviceApis.stream().filter(serviceApi -> serviceApi.getServiceAccessPaymentPolicy().equals(WELL_DEFINED_PRICE)).map(ServiceApi::getId).map(String::valueOf).collect(Collectors.toList());
-        }
-        return payPerCallServicesIds;
-    }
-
-
-    // TODO move to ServiceApiService
-    @Deprecated
-    public List<User> getServiceConsumers(List<ServiceApi> servicesProvidedByUser) {
-        return servicesProvidedByUser.stream()
-                .flatMap(api -> api.getApiKeys().stream())
-                .map(ApiKey::getUser)
-                .distinct()
-                .collect(Collectors.toList());
-    }
 
     public ServiceUsageStatisticsDTO getServiceUsageStatistics(
             String uriIdentifier, String serviceOwnerUsername, String dateFromString, String dateUntilString, User consumer) {

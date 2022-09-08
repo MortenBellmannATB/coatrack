@@ -23,6 +23,7 @@ package eu.coatrack.admin.controllers;
 import eu.coatrack.admin.model.repository.ServiceApiRepository;
 import eu.coatrack.admin.model.repository.UserRepository;
 import eu.coatrack.admin.service.PublicApiService;
+import eu.coatrack.admin.service.ServiceApiService;
 import eu.coatrack.admin.service.report.ReportService;
 import eu.coatrack.api.ServiceApi;
 import eu.coatrack.api.ServiceApiDTO;
@@ -54,20 +55,20 @@ public class PublicApiController {
     private PublicApiService publicApiService;
 
     @Autowired
+    private ServiceApiService serviceApiService;
+
+    @Autowired
     private ReportService reportService;
 
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private ServiceApiRepository serviceApiRepository;
 
     @GetMapping(value = "/services/{serviceOwnerUsername}/{uriIdentifier}", produces = "application/json")
     @ApiOperation(value = "Get specific service by owner and URI Identifier",
             notes = "<b> uriIdentifier </b> - the URI identifier that is used in CoatRack to identify the service\n" +
                     "<b> serviceOwnerUsername </b> - this is the Github username of the one who owns and offers the service via Coatrack\n")
     public ServiceApiDTO findByServiceOwnerAndUriIdentifier(@PathVariable("uriIdentifier") String uriIdentifier, @PathVariable("serviceOwnerUsername") String serviceOwnerUsername) {
-        return publicApiService.findByServiceOwnerAndUriIdentifier(serviceOwnerUsername, uriIdentifier);
+        return serviceApiService.findByServiceOwnerAndUriIdentifier(serviceOwnerUsername, uriIdentifier);
     }
 
     @GetMapping(value = "/services", produces = "application/json")
@@ -77,7 +78,7 @@ public class PublicApiController {
         List<ServiceApiDTO> result = new ArrayList<>();
 
         if(auth != null) {
-            result = publicApiService.findByServiceOwner(auth.getName());
+            result = serviceApiService.findByServiceOwner(auth.getName());
         }
         return result;
     }
@@ -91,7 +92,7 @@ public class PublicApiController {
 
         if(auth != null) {
             User userWhoSubscribes = userRepository.findByUsername(auth.getName());
-            ServiceApi serviceToSubscribeTo = serviceApiRepository.findServiceApiByServiceOwnerAndUriIdentifier(serviceOwnerUsername, uriIdentifier);
+            ServiceApi serviceToSubscribeTo = serviceApiService.findServiceApiByServiceOwnerAndUriIdentifier(serviceOwnerUsername, uriIdentifier);
 
             publicApiService.subscribeToService(serviceToSubscribeTo, userWhoSubscribes);
         }

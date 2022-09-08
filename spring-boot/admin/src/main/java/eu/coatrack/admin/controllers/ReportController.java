@@ -20,9 +20,8 @@ package eu.coatrack.admin.controllers;
  * #L%
  */
 
-import eu.coatrack.admin.model.repository.ApiKeyRepository;
-import eu.coatrack.admin.model.repository.ServiceApiRepository;
 import eu.coatrack.admin.model.repository.UserRepository;
+import eu.coatrack.admin.service.ServiceApiService;
 import eu.coatrack.admin.service.report.ApiUsageDTO;
 import eu.coatrack.admin.service.report.ReportService;
 import eu.coatrack.api.ApiUsageReport;
@@ -55,10 +54,7 @@ public class ReportController {
     private UserRepository userRepository;
 
     @Autowired
-    private ServiceApiRepository serviceApiRepository;
-
-    @Autowired
-    private ApiKeyRepository apiKeyRepository;
+    private ServiceApiService serviceApiService;
 
     @Autowired
     private ReportService reportService;
@@ -84,9 +80,9 @@ public class ReportController {
             ApiUsageDTO report = getApiUsageDTO(dateFrom, dateUntil, selectedServiceId, selectedApiConsumerUserId, considerOnlyPaidCalls);
 
             User currentUser = userRepository.findByUsername(auth.getName());
-            List<ServiceApi> servicesProvided = serviceApiRepository.findByDeletedWhen(null);
-            List<User> totalConsumers = reportService.getServiceConsumers(servicesProvided);
-            List<String> idsPayedPerCall = reportService.getPayPerCallServicesIds(servicesProvided);
+            List<ServiceApi> servicesProvided = serviceApiService.findIfNotDeleted();
+            List<User> totalConsumers = serviceApiService.getServiceConsumers(servicesProvided);
+            List<String> idsPayedPerCall = serviceApiService.getPayPerCallServicesIds(servicesProvided);
 
             // generell data
             response.addObject("users", totalConsumers);
@@ -130,9 +126,9 @@ public class ReportController {
             ApiUsageDTO report = getApiUsageDTO(dateFromString, dateUntilString, selectedServiceId, -1L, considerOnlyPaidCalls);
 
             User currentUser = userRepository.findByUsername(auth.getName());
-            List<ServiceApi> servicesFromUser = serviceApiRepository.findByApiKeyList(apiKeyRepository.findByLoggedInAPIConsumer());
-            List<String> payPerCallServicesIds = reportService.getPayPerCallServicesIds(servicesFromUser);
-            List<User> totalConsumers = reportService.getServiceConsumers(servicesFromUser);
+            List<ServiceApi> servicesFromUser = serviceApiService.findFromActiveUser();
+            List<String> payPerCallServicesIds = serviceApiService.getPayPerCallServicesIds(servicesFromUser);
+            List<User> totalConsumers = serviceApiService.getServiceConsumers(servicesFromUser);
 
             response.addObject("selectedServiceId", selectedServiceId);
             response.addObject("selectedApiConsumerUserId", currentUser.getId());
@@ -152,10 +148,10 @@ public class ReportController {
         return response;
     }
 
-    private ApiUsageDTO getApiUsageDTO(String dateFrom, String dateUntil, Long selectedServiceId, Long apiConsumerId, boolean considerOnlyPaidCalls)  {
+    private ApiUsageDTO getApiUsageDTO(String dateFrom, String dateUntil, long selectedServiceId, long apiConsumerId, boolean considerOnlyPaidCalls)  {
         Date from = parseDateStringOrGetTodayIfNull(dateFrom);
         Date until = parseDateStringOrGetTodayIfNull(dateUntil);
-        ServiceApi selectedService = serviceApiRepository.findById(selectedServiceId).orElse(null);
+        ServiceApi selectedService = serviceApiService.findById(selectedServiceId);
         User selectedConsumer = userRepository.findById(apiConsumerId).orElse(null);
         return new ApiUsageDTO(selectedService, selectedConsumer, from, until, considerOnlyPaidCalls, false);
     }
