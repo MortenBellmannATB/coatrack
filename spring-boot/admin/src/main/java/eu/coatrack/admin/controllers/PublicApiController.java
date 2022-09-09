@@ -20,11 +20,10 @@ package eu.coatrack.admin.controllers;
  * #L%
  */
 
-import eu.coatrack.admin.model.repository.ServiceApiRepository;
-import eu.coatrack.admin.model.repository.UserRepository;
 import eu.coatrack.admin.service.PublicApiService;
 import eu.coatrack.admin.service.ServiceApiService;
 import eu.coatrack.admin.service.report.ReportService;
+import eu.coatrack.admin.service.user.UserService;
 import eu.coatrack.api.ServiceApi;
 import eu.coatrack.api.ServiceApiDTO;
 import eu.coatrack.api.ServiceUsageStatisticsDTO;
@@ -37,7 +36,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,7 +59,7 @@ public class PublicApiController {
     private ReportService reportService;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
     @GetMapping(value = "/services/{serviceOwnerUsername}/{uriIdentifier}", produces = "application/json")
     @ApiOperation(value = "Get specific service by owner and URI Identifier",
@@ -88,11 +86,13 @@ public class PublicApiController {
             notes = "<b> uriIdentifier </b> - the URI identifier that is used in CoatRack to identify the service\n" +
                     "<b> serviceOwnerUsername </b> - this is the Github username of the one who owns and offers the service via Coatrack\n")
     public String subscribeToService(@PathVariable("uriIdentifier") String uriIdentifier, @PathVariable("serviceOwnerUsername") String serviceOwnerUsername) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User userWhoSubscribes = userService.getAuthenticatedUser();
 
-        if(auth != null) {
-            User userWhoSubscribes = userRepository.findByUsername(auth.getName());
-            ServiceApi serviceToSubscribeTo = serviceApiService.findServiceApiByServiceOwnerAndUriIdentifier(serviceOwnerUsername, uriIdentifier);
+        if(userWhoSubscribes != null) {
+            ServiceApi serviceToSubscribeTo = serviceApiService.findServiceApiByServiceOwnerAndUriIdentifier(
+                    serviceOwnerUsername,
+                    uriIdentifier
+            );
 
             publicApiService.subscribeToService(serviceToSubscribeTo, userWhoSubscribes);
         }
@@ -110,11 +110,10 @@ public class PublicApiController {
             @PathVariable("serviceOwnerUsername") String serviceOwnerUsername,
             @RequestParam String dateFrom,
             @RequestParam String dateUntil)  {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         ServiceUsageStatisticsDTO dto = new ServiceUsageStatisticsDTO();
+        User authenticatedUser = userService.getAuthenticatedUser();
 
-        if(auth != null) {
-            User authenticatedUser = userRepository.findByUsername(auth.getName());
+        if(authenticatedUser != null) {
             dto = reportService.getServiceUsageStatistics(uriIdentifier, serviceOwnerUsername, dateFrom, dateUntil, authenticatedUser);
         }
         return dto;

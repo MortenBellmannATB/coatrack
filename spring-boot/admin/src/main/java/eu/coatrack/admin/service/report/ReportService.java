@@ -73,7 +73,8 @@ public class ReportService {
 
 
     public ServiceUsageStatisticsDTO getServiceUsageStatistics(
-            String uriIdentifier, String serviceOwnerUsername, String dateFromString, String dateUntilString, User consumer) {
+            String uriIdentifier, String serviceOwnerUsername, String dateFromString, String dateUntilString, User consumer
+    ) {
 
         String authenticatedUserName = SecurityContextHolder.getContext().getAuthentication().getName();
         ServiceApi service = serviceApiRepository.findServiceApiByServiceOwnerAndUriIdentifier(serviceOwnerUsername, uriIdentifier);

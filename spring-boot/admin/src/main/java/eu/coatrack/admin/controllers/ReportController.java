@@ -20,10 +20,10 @@ package eu.coatrack.admin.controllers;
  * #L%
  */
 
-import eu.coatrack.admin.model.repository.UserRepository;
 import eu.coatrack.admin.service.ServiceApiService;
 import eu.coatrack.admin.service.report.ApiUsageDTO;
 import eu.coatrack.admin.service.report.ReportService;
+import eu.coatrack.admin.service.user.UserService;
 import eu.coatrack.api.ApiUsageReport;
 import eu.coatrack.api.DataTableView;
 import eu.coatrack.api.ServiceApi;
@@ -35,10 +35,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-
 import java.util.Date;
 import java.util.List;
-
 import static eu.coatrack.admin.utils.DateUtils.parseDateStringOrGetTodayIfNull;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
@@ -51,7 +49,7 @@ public class ReportController {
     public static final String REPORT_VIEW = "admin/reports/report";
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
     @Autowired
     private ServiceApiService serviceApiService;
@@ -73,13 +71,12 @@ public class ReportController {
             @PathVariable("isOnlyPaidCalls") boolean considerOnlyPaidCalls
     ) {
         ModelAndView response = new ModelAndView(REPORT_VIEW);
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = userService.getAuthenticatedUser();
 
-        if (auth != null) {
+        if (currentUser != null) {
 
             ApiUsageDTO report = getApiUsageDTO(dateFrom, dateUntil, selectedServiceId, selectedApiConsumerUserId, considerOnlyPaidCalls);
 
-            User currentUser = userRepository.findByUsername(auth.getName());
             List<ServiceApi> servicesProvided = serviceApiService.findIfNotDeleted();
             List<User> totalConsumers = serviceApiService.getServiceConsumers(servicesProvided);
             List<String> idsPayedPerCall = serviceApiService.getPayPerCallServicesIds(servicesProvided);
@@ -120,12 +117,11 @@ public class ReportController {
             @PathVariable("isOnlyPaidCalls") boolean considerOnlyPaidCalls
     ) {
         ModelAndView response = new ModelAndView(REPORT_VIEW);
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = userService.getAuthenticatedUser();
 
-        if (auth != null) {
+        if (currentUser != null) {
             ApiUsageDTO report = getApiUsageDTO(dateFromString, dateUntilString, selectedServiceId, -1L, considerOnlyPaidCalls);
 
-            User currentUser = userRepository.findByUsername(auth.getName());
             List<ServiceApi> servicesFromUser = serviceApiService.findFromActiveUser();
             List<String> payPerCallServicesIds = serviceApiService.getPayPerCallServicesIds(servicesFromUser);
             List<User> totalConsumers = serviceApiService.getServiceConsumers(servicesFromUser);
@@ -152,7 +148,7 @@ public class ReportController {
         Date from = parseDateStringOrGetTodayIfNull(dateFrom);
         Date until = parseDateStringOrGetTodayIfNull(dateUntil);
         ServiceApi selectedService = serviceApiService.findById(selectedServiceId);
-        User selectedConsumer = userRepository.findById(apiConsumerId).orElse(null);
+        User selectedConsumer = userService.findById(apiConsumerId);
         return new ApiUsageDTO(selectedService, selectedConsumer, from, until, considerOnlyPaidCalls, false);
     }
 
