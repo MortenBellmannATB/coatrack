@@ -23,8 +23,10 @@ public class ReportDataFactory {
             getUser(3L, "Steffen")
     );
 
+    public final static ServiceApi serviceApi = getServiceApi(1L, MONTHLY_FEE, 500L);
+
     public final static List<ServiceApi> serviceApis = Arrays.asList(
-            getServiceApi(1L, MONTHLY_FEE, 500L),
+            serviceApi,
             getServiceApi(2L, WELL_DEFINED_PRICE, 1000L)
     );
 

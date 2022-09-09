@@ -2,11 +2,9 @@ package eu.coatrack.admin.report;
 
 import eu.coatrack.admin.controllers.ReportController;
 import eu.coatrack.admin.config.TestConfiguration;
-import eu.coatrack.admin.model.repository.ApiKeyRepository;
-import eu.coatrack.admin.model.repository.ServiceApiRepository;
-import eu.coatrack.admin.model.repository.UserRepository;
 import eu.coatrack.admin.service.ServiceApiService;
 import eu.coatrack.admin.service.report.ReportService;
+import eu.coatrack.admin.service.user.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,7 +15,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.Collections;
-import java.util.Optional;
+
 import static eu.coatrack.admin.report.ReportDataFactory.*;
 import static eu.coatrack.admin.utils.DateUtils.*;
 import static org.exparity.hamcrest.date.DateMatchers.sameDay;
@@ -36,7 +34,7 @@ public class ReportControllerTest {
 
     private final ReportController reportController;
 
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final ServiceApiService serviceApiService;
     private final ReportService reportService;
 
@@ -44,19 +42,21 @@ public class ReportControllerTest {
     private final String basePath = "/admin/reports";
 
     public ReportControllerTest() {
-        userRepository = mock(UserRepository.class);
+        userService = mock(UserService.class);
         serviceApiService = mock(ServiceApiService.class);
         reportService = mock(ReportService.class);
 
-        doReturn(consumer).when(userRepository).findByUsername(anyString());
+        doReturn(consumer).when(userService).getAuthenticatedUser();
 
-        reportController = new ReportController(userRepository, serviceApiService, reportService);
+        reportController = new ReportController(userService, serviceApiService, reportService);
 
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ADMIN");
         Authentication authentication = new UsernamePasswordAuthenticationToken(consumer.getUsername(), "PetesPassword", Collections.singletonList(authority));
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         mvc = MockMvcBuilders.standaloneSetup(reportController).build();
+
+
     }
 
     @Test
@@ -118,10 +118,11 @@ public class ReportControllerTest {
 
     @Test
     public void showGenerateReportPageForServiceConsumer() throws Exception {
+        doReturn(serviceApi).when(serviceApiService).findById(anyLong());
         doReturn(serviceApis).when(serviceApiService).findFromActiveUser();
-        doReturn(serviceApis.get(0)).when(serviceApiService).findById(anyLong());
         doReturn(payPerCallServiceIds).when(serviceApiService).getPayPerCallServicesIds(anyList());
         doReturn(consumers).when(serviceApiService).getServiceConsumers(anyList());
+
 
         mvc.perform(get(basePath + "/consumer"))
                 .andDo(print())
@@ -136,7 +137,7 @@ public class ReportControllerTest {
                 .andExpect(model().attribute("isReportForConsumer", false)) // TODO to delete
                 .andExpect(model().attribute("dateFrom", sameDay(getToday()))) // TODO delete
                 .andExpect(model().attribute("dateUntil", sameDay(getToday()))) // TODO delete
-                .andExpect(model().attribute("serviceApiSelectedForReport", is(serviceApis.get(0)))); // TODO delete
+                .andExpect(model().attribute("serviceApiSelectedForReport", is(serviceApi))); // TODO delete
     }
 
     @Test

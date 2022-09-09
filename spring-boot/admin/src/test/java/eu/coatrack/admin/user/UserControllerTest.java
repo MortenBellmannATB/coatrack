@@ -3,6 +3,7 @@ package eu.coatrack.admin.user;
 import eu.coatrack.admin.config.TestConfiguration;
 import eu.coatrack.admin.controllers.UserController;
 import eu.coatrack.admin.model.repository.UserRepository;
+import eu.coatrack.admin.service.user.UserService;
 import eu.coatrack.api.User;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
@@ -34,16 +35,16 @@ public class UserControllerTest {
 
     private final UserController userController;
 
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final MockMvc mvc;
     private final static String basePath = "";
 
     public UserControllerTest() {
-        userRepository = mock(UserRepository.class);
+        userService = mock(UserService.class);
 
-        doReturn(Optional.of(user)).when(userRepository).findById(anyLong());
+        doReturn(user).when(userService).findById(anyLong());
 
-        userController = new UserController(userRepository);
+        userController = new UserController(userService);
 
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ADMIN");
         Authentication authentication = new UsernamePasswordAuthenticationToken(consumer.getUsername(), "PetesPassword", Collections.singletonList(authority));
@@ -55,7 +56,6 @@ public class UserControllerTest {
 
     @Test
     public void userEmailVeritification() throws Exception {
-
         String query = String.format("%s/users/%d/verify/%s",
                 basePath,
                 user.getId(),
