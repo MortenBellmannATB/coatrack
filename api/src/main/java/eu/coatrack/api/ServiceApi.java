@@ -20,21 +20,25 @@ package eu.coatrack.api;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.*;
 import javax.validation.constraints.Size;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 /**
  *
  * @author gr-hovest
  */
+@NoArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "service_apis")
 public class ServiceApi implements ServiceApiInterface{
@@ -55,7 +59,6 @@ public class ServiceApi implements ServiceApiInterface{
     @Column(nullable = false)
     private String localUrl;
 
-    private double monthlyFee;
 
     @Enumerated(EnumType.STRING)
     private ServiceAccessPermissionPolicy serviceAccessPermissionPolicy;
@@ -78,134 +81,11 @@ public class ServiceApi implements ServiceApiInterface{
     @Temporal(javax.persistence.TemporalType.DATE)
     private Date deletedWhen;
 
-    /*@OneToOne(optional = true)
-    private ServiceCover cover;
-
-    public ServiceCover getCover() {
-        return cover;
-    }
-
-    public void setCover(ServiceCover cover) {
-        this.cover = cover;
-    }*/
-
-    public User getOwner() {
-        return owner;
-    }
-
-    public void setOwner(User owner) {
-        this.owner = owner;
-    }
-
-    public double getMonthlyFee() {
-        return monthlyFee;
-    }
-
-    public void setMonthlyFee(double monthlyFee) {
-        this.monthlyFee = monthlyFee;
-    }
-
-    public Date getDeletedWhen() {
-        return deletedWhen;
-    }
-
-    public void setDeletedWhen(Date deletedWhen) {
-        this.deletedWhen = deletedWhen;
-    }
-
-    public List<ApiKey> getApiKeys() {
-        return apiKeys;
-    }
-
-    public void setApiKeys(List<ApiKey> apiKey) {
-        this.apiKeys = apiKey;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    /**
-     *
-     * @return the name to identify this ServiceApi in the admin GUI
-     */
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
-     *
-     * @return a description of this service API, its intended purpose and use
-     */
-    public String getDescription() {
-        return description;
-    }
+    private double monthlyFee;
 
     @Override
     public String getServiceOwnerUsername() {
         return owner.getUsername();
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    /**
-     *
-     * @return the part of the service gateway URI that identifies this service
-     * API
-     */
-    public String getUriIdentifier() {
-        return uriIdentifier;
-    }
-
-    public void setUriIdentifier(String uriIdentifier) {
-        this.uriIdentifier = uriIdentifier;
-    }
-
-    /**
-     *
-     * @return the URL in the local area network of the service API provider
-     * where the service can be reached via the service gateway
-     */
-    public String getLocalUrl() {
-        return localUrl;
-    }
-
-    public void setLocalUrl(String localUrl) {
-        this.localUrl = localUrl;
-    }
-
-    public ServiceAccessPermissionPolicy getServiceAccessPermissionPolicy() {
-        return serviceAccessPermissionPolicy;
-    }
-
-    public void setServiceAccessPermissionPolicy(ServiceAccessPermissionPolicy serviceAccessPermissionPolicy) {
-        this.serviceAccessPermissionPolicy = serviceAccessPermissionPolicy;
-    }
-
-    public ServiceAccessPaymentPolicy getServiceAccessPaymentPolicy() {
-        return serviceAccessPaymentPolicy;
-    }
-
-    public void setServiceAccessPaymentPolicy(ServiceAccessPaymentPolicy serviceAccessPaymentPolicy) {
-        this.serviceAccessPaymentPolicy = serviceAccessPaymentPolicy;
-    }
-
-    public List<EntryPoint> getEntryPoints() {
-        return entryPoints;
-    }
-
-    public void setEntryPoints(List<EntryPoint> entryPoints) {
-        this.entryPoints = entryPoints;
     }
 
     @Override

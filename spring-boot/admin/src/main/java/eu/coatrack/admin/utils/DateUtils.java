@@ -2,61 +2,54 @@ package eu.coatrack.admin.utils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.Locale;
+
+import static java.lang.Math.toIntExact;
+import static java.time.temporal.ChronoField.*;
+import static java.time.temporal.ChronoUnit.MONTHS;
 
 public class DateUtils {
     private static SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
 
-    public static Date parseDateStringOrGetTodayIfNull(String dateString) {
-        Date date = getToday();
-        if (dateString != null) {
-            try {
-                date = df.parse(dateString);
-            } catch (ParseException ex) {
-                ex.printStackTrace();
-            }
-        }
+    public static LocalDate getLocalDateOrTodayIfNull(String dateString) {
+        LocalDate date = LocalDate.now();
+        if (dateString != null)
+            date = LocalDate.parse(dateString);
         return date;
     }
 
-    public static Date getToday() {
-        Calendar today = Calendar.getInstance();
-        today.set(Calendar.HOUR_OF_DAY, 0);
-        today.set(Calendar.MINUTE, 0);
-        today.set(Calendar.SECOND, 0);
-        return today.getTime();
+    // TODO Date should be replaced completely with LocalDate
+    @Deprecated
+    public static Date localDateToDate(LocalDate localDate)  {
+        return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
     }
 
-    public static Date getTodayLastMonth() {
-        Calendar today = Calendar.getInstance();
-        today.set(Calendar.HOUR_OF_DAY, 0);
-        today.set(Calendar.MINUTE, 0);
-        today.set(Calendar.SECOND, 0);
-        today.add(Calendar.MONTH, -1);
-        return today.getTime();
+    // TODO Date should be replaced completely with LocalDate
+    @Deprecated
+    public static Date getTodayAsDate() {
+        return localDateToDate(LocalDate.now());
     }
 
     public static String getTodayAsString() {
-        Calendar today = Calendar.getInstance();
-        int month = today.get(Calendar.MONTH)+1;
+        LocalDate today = LocalDate.now();
+        int month = today.get(MONTH_OF_YEAR);
         String zeroPrefix = month < 10 ? "0" : "";
         String monthString = String.format("%s%d", zeroPrefix, month);
-        return String.format("%d-%s-%d",
-                today.get(Calendar.YEAR), monthString, today.get(Calendar.DAY_OF_MONTH));
+        return String.format("%d-%s-%d", today.get(YEAR), monthString, today.get(DAY_OF_MONTH));
     }
 
     public static String getTodayLastMonthAsString() {
-        Calendar today = Calendar.getInstance();
-        int month = today.get(Calendar.MONTH);
+        LocalDate today = LocalDate.now().minusMonths(1);
+        int month = today.get(MONTH_OF_YEAR);
         String zeroPrefix = month < 10 ? "0" : "";
         String monthString = String.format("%s%d", zeroPrefix, month);
-        return String.format("%d-%s-%d",
-                today.get(Calendar.YEAR), monthString, today.get(Calendar.DAY_OF_MONTH));
+        return String.format("%d-%s-%d", today.get(YEAR), monthString, today.get(DAY_OF_MONTH));
     }
 
-    public static Date getDateFromString(String dateString) {
+    public static Date getLocalDateFromString(String dateString) {
         Date date;
         try {
             date = df.parse(dateString);
@@ -64,6 +57,10 @@ public class DateUtils {
             throw new RuntimeException(e);
         }
         return date;
+    }
+
+    public static int getMonthDifference(LocalDate from, LocalDate until) {
+        return toIntExact(MONTHS.between(from, until));
     }
 
 

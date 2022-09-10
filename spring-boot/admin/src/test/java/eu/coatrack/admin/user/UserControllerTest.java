@@ -2,10 +2,7 @@ package eu.coatrack.admin.user;
 
 import eu.coatrack.admin.config.TestConfiguration;
 import eu.coatrack.admin.controllers.UserController;
-import eu.coatrack.admin.model.repository.UserRepository;
 import eu.coatrack.admin.service.user.UserService;
-import eu.coatrack.api.User;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,19 +12,16 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
-
 import java.util.Collections;
-import java.util.Optional;
-
 import static eu.coatrack.admin.report.ReportDataFactory.consumer;
+import static eu.coatrack.admin.user.UserDataFactory.emailVerificationCode;
+import static eu.coatrack.admin.user.UserDataFactory.user;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doReturn;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static eu.coatrack.admin.user.UserDataFactory.*;
 import static org.mockito.Mockito.mock;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 @ContextConfiguration(classes = TestConfiguration.class)
 @WebMvcTest(UserController.class)
@@ -56,6 +50,7 @@ public class UserControllerTest {
 
     @Test
     public void userEmailVeritification() throws Exception {
+
         String query = String.format("%s/users/%d/verify/%s",
                 basePath,
                 user.getId(),

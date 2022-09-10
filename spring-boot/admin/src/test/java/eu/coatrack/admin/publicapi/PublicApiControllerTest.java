@@ -2,7 +2,6 @@ package eu.coatrack.admin.publicapi;
 
 import eu.coatrack.admin.config.TestConfiguration;
 import eu.coatrack.admin.controllers.PublicApiController;
-import eu.coatrack.admin.model.repository.UserRepository;
 import eu.coatrack.admin.service.PublicApiService;
 import eu.coatrack.admin.service.ServiceApiService;
 import eu.coatrack.admin.service.report.ReportService;
@@ -16,9 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
 import java.util.Collections;
-
 import static eu.coatrack.admin.publicapi.PublicApiDataFactory.serviceOwner;
 import static eu.coatrack.admin.publicapi.PublicApiDataFactory.uriIdentifier;
 import static eu.coatrack.admin.report.ReportDataFactory.consumer;
