@@ -1,12 +1,10 @@
 package eu.coatrack.admin.report;
 
-import eu.coatrack.admin.controllers.ReportController;
 import eu.coatrack.admin.config.TestConfiguration;
-import eu.coatrack.admin.model.repository.ApiKeyRepository;
-import eu.coatrack.admin.model.repository.ServiceApiRepository;
-import eu.coatrack.admin.model.repository.UserRepository;
+import eu.coatrack.admin.controllers.ReportController;
 import eu.coatrack.admin.service.ServiceApiService;
 import eu.coatrack.admin.service.report.ReportService;
+import eu.coatrack.admin.service.user.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,14 +14,15 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import java.time.LocalDate;
 import java.util.Collections;
-import java.util.Optional;
 import static eu.coatrack.admin.report.ReportDataFactory.*;
-import static eu.coatrack.admin.utils.DateUtils.*;
-import static org.exparity.hamcrest.date.DateMatchers.sameDay;
+import static eu.coatrack.admin.utils.DateUtils.getTodayAsString;
+import static eu.coatrack.admin.utils.DateUtils.getTodayLastMonthAsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -36,7 +35,7 @@ public class ReportControllerTest {
 
     private final ReportController reportController;
 
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final ServiceApiService serviceApiService;
     private final ReportService reportService;
 
@@ -44,13 +43,13 @@ public class ReportControllerTest {
     private final String basePath = "/admin/reports";
 
     public ReportControllerTest() {
-        userRepository = mock(UserRepository.class);
+        userService = mock(UserService.class);
         serviceApiService = mock(ServiceApiService.class);
         reportService = mock(ReportService.class);
 
-        doReturn(consumer).when(userRepository).findByUsername(anyString());
+        doReturn(consumer).when(userService).getAuthenticatedUser();
 
-        reportController = new ReportController(userRepository, serviceApiService, reportService);
+        reportController = new ReportController(userService, serviceApiService, reportService);
 
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ADMIN");
         Authentication authentication = new UsernamePasswordAuthenticationToken(consumer.getUsername(), "PetesPassword", Collections.singletonList(authority));
@@ -77,8 +76,8 @@ public class ReportControllerTest {
                 .andExpect(model().attribute("exportUser", is(consumer)))
                 .andExpect(model().attribute("isOnlyPaidCalls", false)) // TODO delete
                 .andExpect(model().attribute("isReportForConsumer", false)) // TODO delete
-                .andExpect(model().attribute("dateFrom", sameDay(getToday()))) // TODO delete
-                .andExpect(model().attribute("dateUntil", sameDay(getToday()))) // TODO delete
+                .andExpect(model().attribute("dateFrom", LocalDate.now())) // TODO delete
+                .andExpect(model().attribute("dateUntil", LocalDate.now())) // TODO delete
                 .andExpect(model().attribute("serviceApiSelectedForReport", is(nullValue()))) // TODO delete
                 .andExpect(model().attribute("consumerUserSelectedForReport", is(nullValue()))); // TODO delete
     }
@@ -110,10 +109,10 @@ public class ReportControllerTest {
                 .andExpect(model().attribute("exportUser", is(consumer)))
                 .andExpect(model().attribute("isOnlyPaidCalls", false)) // TODO delete
                 .andExpect(model().attribute("isReportForConsumer", false)) // TODO delete
-                .andExpect(model().attribute("dateFrom", sameDay(parseDateStringOrGetTodayIfNull(getTodayLastMonthAsString())))) // TODO delete
-                .andExpect(model().attribute("dateUntil", sameDay(getToday()))) // TODO delete
-                .andExpect(model().attribute("serviceApiSelectedForReport", is(nullValue()))) // TODO delete
-                .andExpect(model().attribute("consumerUserSelectedForReport", is(nullValue()))); // TODO delete
+                .andExpect(model().attribute("dateFrom", LocalDate.now().minusMonths(1))) // TODO delete
+                .andExpect(model().attribute("dateUntil", LocalDate.now())) // TODO delete
+                .andExpect(model().attribute("serviceApiSelectedForReport", nullValue())) // TODO delete
+                .andExpect(model().attribute("consumerUserSelectedForReport", nullValue())); // TODO delete
     }
 
     @Test
@@ -134,8 +133,8 @@ public class ReportControllerTest {
                 .andExpect(model().attribute("users", consumers))
                 .andExpect(model().attribute("isOnlyPaidCalls", false)) // TODO to delete
                 .andExpect(model().attribute("isReportForConsumer", false)) // TODO to delete
-                .andExpect(model().attribute("dateFrom", sameDay(getToday()))) // TODO delete
-                .andExpect(model().attribute("dateUntil", sameDay(getToday()))) // TODO delete
+                .andExpect(model().attribute("dateFrom", LocalDate.now())) // TODO delete
+                .andExpect(model().attribute("dateUntil", LocalDate.now())) // TODO delete
                 .andExpect(model().attribute("serviceApiSelectedForReport", is(serviceApis.get(0)))); // TODO delete
     }
 
@@ -165,8 +164,8 @@ public class ReportControllerTest {
                 .andExpect(model().attribute("users", consumers))
                 .andExpect(model().attribute("isOnlyPaidCalls", false)) // TODO to delete
                 .andExpect(model().attribute("isReportForConsumer", false)) // TODO to delete
-                .andExpect(model().attribute("dateFrom", sameDay(parseDateStringOrGetTodayIfNull(getTodayLastMonthAsString())))) // TODO delete
-                .andExpect(model().attribute("dateUntil", sameDay(getToday()))) // TODO delete
+                .andExpect(model().attribute("dateFrom", LocalDate.now().minusMonths(1))) // TODO delete
+                .andExpect(model().attribute("dateUntil", LocalDate.now())) // TODO delete
                 .andExpect(model().attribute("serviceApiSelectedForReport", is(serviceApis.get(0)))); // TODO delete
     }
 }

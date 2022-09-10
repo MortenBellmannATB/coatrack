@@ -1,6 +1,5 @@
 package eu.coatrack.admin.service.report;
 
-import eu.coatrack.admin.model.repository.ServiceApiRepository;
 import eu.coatrack.api.*;
 import lombok.AllArgsConstructor;
 import lombok.Setter;
@@ -8,12 +7,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import static eu.coatrack.admin.utils.DateUtils.getDateFromString;
 
 
 @Slf4j
@@ -21,11 +19,6 @@ import static eu.coatrack.admin.utils.DateUtils.getDateFromString;
 @AllArgsConstructor
 @Setter
 public class ReportService {
-    // TODO serviceApi dependency can be moved up by 1 layer, there is no other usage
-    @Deprecated
-    @Autowired
-    private final ServiceApiRepository serviceApiRepository;
-
     @Autowired
     private ApiUsageCalculator apiUsageCalculator;
 
@@ -43,7 +36,7 @@ public class ReportService {
         return table;
     }
 
-    public double reportTotalRevenueForApiProvider(List<ServiceApi> offeredServices, Date from, Date until) {
+    public double reportTotalRevenueForApiProvider(List<ServiceApi> offeredServices, LocalDate from, LocalDate until) {
         List<ApiUsageReport> apiUsageReportsForAllOfferedServices = new ArrayList<>();
 
         for (ServiceApi service : offeredServices) {
@@ -60,30 +53,19 @@ public class ReportService {
         return apiUsageCalculator.calculateForSpecificService(apiUsageDTO);
     }
 
-    // TODO this has to be changed with AdminController refactoring
-    @Deprecated
-    public double reportTotalRevenueForApiProvider(String apiProviderUsername, LocalDate timePeriodStart, LocalDate timePeriodEnd) {
-        Date from = java.sql.Date.valueOf(timePeriodStart);
-        Date until = java.sql.Date.valueOf(timePeriodEnd);
-
-        // TODO move to ServiceApiService after refactoring admin controller, serviceApiRepository can be moved to AdminController
-        List<ServiceApi> offeredServices = serviceApiRepository.findByOwnerUsername(apiProviderUsername);
-        return reportTotalRevenueForApiProvider(offeredServices, from, until);
-    }
-
 
     public ServiceUsageStatisticsDTO getServiceUsageStatistics(
-            String uriIdentifier, String serviceOwnerUsername, String dateFromString, String dateUntilString, User consumer
+            ServiceApi service, String dateFromString, String dateUntilString, User consumer
     ) {
 
         String authenticatedUserName = SecurityContextHolder.getContext().getAuthentication().getName();
-        ServiceApi service = serviceApiRepository.findServiceApiByServiceOwnerAndUriIdentifier(serviceOwnerUsername, uriIdentifier);
-        Date from = getDateFromString(dateFromString);
-        Date until = getDateFromString(dateUntilString);
+
+        LocalDate from = LocalDate.parse(dateFromString);
+        LocalDate until = LocalDate.parse(dateUntilString);
 
         ApiUsageDTO apiUsageDTO = new ApiUsageDTO(service, null, from, until, true, false);
 
-        if (!serviceOwnerUsername.equals(authenticatedUserName)) {
+        if (service.getOwner().getUsername().equals(authenticatedUserName)) {
             apiUsageDTO.setConsumer(consumer);
         }
 
@@ -95,7 +77,7 @@ public class ReportService {
                 numberOfCalls,
                 dateFromString,
                 dateUntilString,
-                uriIdentifier,
+                service.getUriIdentifier(),
                 service.getOwner().getUsername()
         );
 

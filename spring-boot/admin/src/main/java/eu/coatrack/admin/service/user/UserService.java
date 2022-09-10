@@ -12,10 +12,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
-
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.util.Properties;
+import static java.lang.Boolean.TRUE;
 
 @AllArgsConstructor
 @Service
@@ -34,6 +34,11 @@ public class UserService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = userRepository.findByUsername(auth.getName());
         return user;
+    }
+
+    public void initializeUser(User user) {
+        user.setInitialized(TRUE);
+        userRepository.save(user);
     }
 
     public void registerUser(User user, BindingResult bindingResult) {
@@ -55,7 +60,7 @@ public class UserService {
         User user = findById(userId);
 
         if (user != null && user.getEmailVerifiedUrl().equals(emailVerificationCode)) {
-            user.setEmailVerified(Boolean.TRUE);
+            user.setEmailVerified(TRUE);
             userRepository.save(user);
         }
     }

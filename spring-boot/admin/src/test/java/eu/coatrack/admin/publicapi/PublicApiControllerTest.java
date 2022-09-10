@@ -2,11 +2,10 @@ package eu.coatrack.admin.publicapi;
 
 import eu.coatrack.admin.config.TestConfiguration;
 import eu.coatrack.admin.controllers.PublicApiController;
-import eu.coatrack.admin.model.repository.ServiceApiRepository;
-import eu.coatrack.admin.model.repository.UserRepository;
 import eu.coatrack.admin.service.PublicApiService;
 import eu.coatrack.admin.service.ServiceApiService;
 import eu.coatrack.admin.service.report.ReportService;
+import eu.coatrack.admin.service.user.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,9 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
 import java.util.Collections;
-
 import static eu.coatrack.admin.publicapi.PublicApiDataFactory.serviceOwner;
 import static eu.coatrack.admin.publicapi.PublicApiDataFactory.uriIdentifier;
 import static eu.coatrack.admin.report.ReportDataFactory.consumer;
@@ -37,7 +34,7 @@ public class PublicApiControllerTest {
 
     private final PublicApiController publicApiController;
     private final ReportService reportService;
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final ServiceApiService serviceApiService;
 
     private final PublicApiService publicApiService;
@@ -48,10 +45,10 @@ public class PublicApiControllerTest {
     public PublicApiControllerTest() {
         publicApiService = mock(PublicApiService.class);
         reportService = mock(ReportService.class);
-        userRepository = mock(UserRepository.class);
+        userService = mock(UserService.class);
         serviceApiService = mock(ServiceApiService.class);
 
-        publicApiController = new PublicApiController(publicApiService, serviceApiService, reportService, userRepository);
+        publicApiController = new PublicApiController(publicApiService, serviceApiService, reportService, userService);
 
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ADMIN");
         Authentication authentication = new UsernamePasswordAuthenticationToken(consumer.getUsername(), "PetesPassword", Collections.singletonList(authority));

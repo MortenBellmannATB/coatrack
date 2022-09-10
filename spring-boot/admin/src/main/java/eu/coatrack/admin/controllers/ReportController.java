@@ -35,9 +35,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
-import static eu.coatrack.admin.utils.DateUtils.parseDateStringOrGetTodayIfNull;
+import static eu.coatrack.admin.utils.DateUtils.getLocalDateOrTodayIfNull;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 @Slf4j
@@ -145,8 +145,8 @@ public class ReportController {
     }
 
     private ApiUsageDTO getApiUsageDTO(String dateFrom, String dateUntil, long selectedServiceId, long apiConsumerId, boolean considerOnlyPaidCalls)  {
-        Date from = parseDateStringOrGetTodayIfNull(dateFrom);
-        Date until = parseDateStringOrGetTodayIfNull(dateUntil);
+        LocalDate from = getLocalDateOrTodayIfNull(dateFrom);
+        LocalDate until = getLocalDateOrTodayIfNull(dateUntil);
         ServiceApi selectedService = serviceApiService.findById(selectedServiceId);
         User selectedConsumer = userService.findById(apiConsumerId);
         return new ApiUsageDTO(selectedService, selectedConsumer, from, until, considerOnlyPaidCalls, false);

@@ -5,9 +5,12 @@ import eu.coatrack.admin.service.report.CallCount;
 import eu.coatrack.api.*;
 import lombok.Getter;
 
-import java.util.*;
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
-import static eu.coatrack.admin.utils.DateUtils.getDateFromString;
 import static eu.coatrack.api.MetricType.RESPONSE;
 import static eu.coatrack.api.ServiceAccessPaymentPolicy.MONTHLY_FEE;
 import static eu.coatrack.api.ServiceAccessPaymentPolicy.WELL_DEFINED_PRICE;
@@ -71,12 +74,12 @@ public class ReportDataFactory {
         return serviceDummy;
     }
     public static ApiUsageDTO getApiUsageDTO(String fromString, ServiceAccessPaymentPolicy accessPaymentPolicy) {
-        Date from = getDateFromString(fromString);
+        LocalDate from = LocalDate.parse(fromString);
         ApiUsageDTO apiUsageDTO = new ApiUsageDTO(
                 getServiceApi(1L, accessPaymentPolicy, 100.0),
                 getUser(1L, "Consumer, simple"),
                 from,
-                new Date(), // TODO this can be a problem
+                LocalDate.now(),
                 false,
                 false
         );
