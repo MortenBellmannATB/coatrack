@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.*;
 
+import static eu.coatrack.admin.utils.DateUtils.getMonthDifference;
+
 @Slf4j
 @Service
 @AllArgsConstructor
@@ -56,15 +58,6 @@ public class ApiUsageCalculator {
         return apiUsageReports;
     }
 
-    private static int getMonthDifference(Date from, Date until) {
-        Calendar startCalendar = new GregorianCalendar();
-        startCalendar.setTime(from);
-        Calendar endCalendar = new GregorianCalendar();
-        endCalendar.setTime(until);
-        int diffYear = endCalendar.get(Calendar.YEAR) - startCalendar.get(Calendar.YEAR);
-        int diffMonth = diffYear * 12 + endCalendar.get(Calendar.MONTH) - startCalendar.get(Calendar.MONTH);
-        return diffMonth;
-    }
 
     public void setCounter(ApiUsageCounter counter) {
         this.counter = counter;

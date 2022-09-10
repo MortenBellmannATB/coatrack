@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,8 +16,8 @@ import java.util.Date;
 public class ApiUsageDTO {
         private ServiceApi service;
         private User consumer;
-        private Date from;
-        private Date until;
+        private LocalDate from;
+        private LocalDate until;
         private boolean considerOnlyPaidCalls;
         private boolean isForConsumer;
 }
