@@ -30,7 +30,6 @@ import eu.coatrack.admin.UserSessionSettings;
 import eu.coatrack.admin.components.WebUI;
 import eu.coatrack.admin.logic.CreateApiKeyAction;
 import eu.coatrack.admin.logic.CreateProxyAction;
-import eu.coatrack.admin.logic.CreateServiceAction;
 import eu.coatrack.admin.model.repository.*;
 import eu.coatrack.admin.model.vo.*;
 import eu.coatrack.admin.service.GatewayHealthMonitorService;
@@ -41,6 +40,7 @@ import eu.coatrack.admin.service.admin.StatisticService;
 import eu.coatrack.admin.service.user.UserService;
 import eu.coatrack.api.*;
 import eu.coatrack.config.github.GithubEmail;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringBootVersion;
@@ -74,17 +74,19 @@ import static org.springframework.web.bind.annotation.RequestMethod.POST;
  */
 @Slf4j
 @Controller
+@Setter
 @RequestMapping(value = "/admin")
 public class AdminController {
-    private static final String ADMIN_HOME_VIEW = "admin/dashboard";
-    private static final String ADMIN_CONSUMER_HOME_VIEW = "admin/consumer_dashboard";
-    private static final String ADMIN_WIZARD_VIEW = "admin/wizard/wizard";
-    private static final String ADMIN_STARTPAGE = "admin/startpage";
-    private static final String ADMIN_CONSUMER_WIZARD = "admin/consumer_wizard/wizard";
-    private static final String ADMIN_PROFILE = "admin/profile/profile";
-    private static final String GITHUB_API_USER = "https://api.github.com/user";
-    private static final String GITHUB_API_EMAIL = GITHUB_API_USER + "/emails";
-    private static final String GATEWAY_HEALTH_MONITOR_FRAGMENT = "admin/fragments/gateway_health_monitor :: gateway-health-monitor";
+    public static final String BASE_PATH = "/admin";
+    public static final String ADMIN_HOME_VIEW = "admin/dashboard";
+    public static final String ADMIN_CONSUMER_HOME_VIEW = "admin/consumer_dashboard";
+    public static final String ADMIN_WIZARD_VIEW = "admin/wizard/wizard";
+    public static final String ADMIN_STARTPAGE = "admin/startpage";
+    public static final String ADMIN_CONSUMER_WIZARD = "admin/consumer_wizard/wizard";
+    public static final String ADMIN_PROFILE = "admin/profile/profile";
+    public static final String GITHUB_API_USER = "https://api.github.com/user";
+    public static final String GITHUB_API_EMAIL = GITHUB_API_USER + "/emails";
+    public static final String GATEWAY_HEALTH_MONITOR_FRAGMENT = "admin/fragments/gateway_health_monitor :: gateway-health-monitor";
 
     @Autowired
     private UserService userService;
@@ -140,7 +142,7 @@ public class AdminController {
             if (exisitingUser != null)
                 mav = prepareModelAndViewByUser(exisitingUser);
             else
-                mav = prepareModelAndViewByAuthentication(auth);
+                mav = prepareModelAndViewViaGithub(auth);
         } else {
             // User is not authenticated
             String springVersion = webUI.parameterizedMessage
@@ -180,7 +182,10 @@ public class AdminController {
         return mav;
     }
 
-    private ModelAndView prepareModelAndViewByAuthentication(Authentication auth) throws JsonProcessingException {
+
+    // Seems not worthy to be unit-tested as it heavily relies on interaction with outer system
+    // TODO clean up
+    private ModelAndView prepareModelAndViewViaGithub(Authentication auth) throws JsonProcessingException {
         // The user is new for our database therefore we try to retrieve as much user
         // info is possible from Github
         OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails) auth.getDetails();
@@ -190,25 +195,27 @@ public class AdminController {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "token " + details.getTokenValue());
         HttpEntity<String> githubRequest = new HttpEntity<String>(headers);
+        ResponseEntity<String> userInfoResponse = restTemplate.exchange
+                (GITHUB_API_USER, HttpMethod.GET, githubRequest, String.class);
 
-        ResponseEntity<String> userInfoResponse = restTemplate.exchange(GITHUB_API_USER, HttpMethod.GET,
-                githubRequest, String.class);
         String userInfo = userInfoResponse.getBody();
 
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        Map<String, Object> userMap = objectMapper.readValue(userInfo, new TypeReference<Map<String, Object>>() {});
 
-        Map<String, Object> userMap = objectMapper.readValue(userInfo,
-                new TypeReference<Map<String, Object>>() {
-                });
         String email = (String) userMap.get("email");
         if (email == null || email.isEmpty()) {
 
-            ResponseEntity<String> userEmailsResponse = restTemplate.exchange(GITHUB_API_EMAIL, HttpMethod.GET,
-                    githubRequest, String.class);
+            ResponseEntity<String> userEmailsResponse = restTemplate.exchange
+                    (GITHUB_API_EMAIL, HttpMethod.GET, githubRequest, String.class);
+
             String userEmails = userEmailsResponse.getBody();
-            List<GithubEmail> emailsList = objectMapper.readValue(userEmails,
-                    objectMapper.getTypeFactory().constructCollectionType(List.class, GithubEmail.class));
+
+            List<GithubEmail> emailsList = objectMapper.readValue(
+                    userEmails,
+                    objectMapper.getTypeFactory().constructCollectionType(List.class, GithubEmail.class)
+            );
 
             Iterator<GithubEmail> it = emailsList.iterator();
             boolean found = false;
