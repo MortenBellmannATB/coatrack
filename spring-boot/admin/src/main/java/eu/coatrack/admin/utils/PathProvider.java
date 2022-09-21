@@ -9,6 +9,7 @@ public class PathProvider {
             ADMIN_STARTPAGE = "admin/startpage",
             ADMIN_CONSUMER_WIZARD = "admin/consumer_wizard/wizard",
             ADMIN_PROFILE = "admin/profile/profile",
+            ADMIN_PROXY = "proxies/",
             GITHUB_API_USER = "https://api.github.com/user",
             GITHUB_API_EMAIL = GITHUB_API_USER + "/emails",
             GATEWAY_HEALTH_MONITOR_FRAGMENT = "admin/fragments/gateway_health_monitor :: gateway-health-monitor",

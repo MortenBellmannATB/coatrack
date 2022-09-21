@@ -1,6 +1,7 @@
 package eu.coatrack.admin.publicapi;
 
 import eu.coatrack.admin.config.TestConfiguration;
+import eu.coatrack.admin.config.ValueConfig;
 import eu.coatrack.admin.controllers.mvc.PublicApiController;
 import eu.coatrack.admin.service.PublicApiService;
 import eu.coatrack.admin.service.ServiceApiService;
@@ -38,6 +39,7 @@ public class PublicApiControllerTest {
     private final ReportService reportService;
     private final UserService userService;
     private final ServiceApiService serviceApiService;
+    private final ValueConfig valueConfig;
 
     private final PublicApiService publicApiService;
     private final MockMvc mvc;
@@ -49,8 +51,10 @@ public class PublicApiControllerTest {
         reportService = mock(ReportService.class);
         userService = mock(UserService.class);
         serviceApiService = mock(ServiceApiService.class);
+        valueConfig = mock(ValueConfig.class);
 
-        publicApiController = new PublicApiController(publicApiService, serviceApiService, reportService, userService);
+
+        publicApiController = new PublicApiController(valueConfig, publicApiService, serviceApiService, reportService, userService);
 
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ADMIN");
         Authentication authentication = new UsernamePasswordAuthenticationToken(consumer.getUsername(), "PetesPassword", Collections.singletonList(authority));

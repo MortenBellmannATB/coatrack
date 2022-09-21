@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static eu.coatrack.admin.utils.PathProvider.ADMIN_PROXY;
+
 @Service
 public class ProxyService {
     @Autowired

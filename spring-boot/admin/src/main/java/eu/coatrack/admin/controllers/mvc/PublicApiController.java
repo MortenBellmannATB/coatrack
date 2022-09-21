@@ -20,7 +20,7 @@ package eu.coatrack.admin.controllers.mvc;
  * #L%
  */
 
-import eu.coatrack.admin.controllers.admin.ValueConfig;
+import eu.coatrack.admin.config.ValueConfig;
 import eu.coatrack.admin.service.PublicApiService;
 import eu.coatrack.admin.service.ServiceApiService;
 import eu.coatrack.admin.service.report.ReportService;
@@ -32,7 +32,6 @@ import eu.coatrack.api.User;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;

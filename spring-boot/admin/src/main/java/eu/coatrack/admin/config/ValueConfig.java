@@ -16,4 +16,7 @@ public class ValueConfig {
     @Value("${ygg.admin.gettingStarted.consumer.testService.uriIdentifier}")
     private String gettingStartedTestServiceIdentifier;
 
+    @Value("${ygg.admin.server.url}")
+    private String coatrackAdminPublicServerURL;
+
 }
