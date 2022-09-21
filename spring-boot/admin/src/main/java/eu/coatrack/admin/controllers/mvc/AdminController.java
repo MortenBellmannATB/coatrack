@@ -83,16 +83,14 @@ public class AdminController {
     @RequestMapping(value = "/serviceWizard", method = POST)
     public ModelAndView serviceWizard(ServiceWizardForm wizard) {
         User authenticatedUser = userService.getAuthenticatedUser();
-        log.debug("got user");
         ServiceApi service = serviceApiService.create(wizard, authenticatedUser);
-        log.debug("got service");
+
         Proxy proxy = proxyService.create(authenticatedUser, service);
-        log.debug("got proxy");
         ApiKey apiKey = apiKeyService.create(authenticatedUser, service);
-        log.debug("got apikey");
 
         authenticatedUser.setInitialized(Boolean.TRUE);
         authenticatedUser = userService.save(authenticatedUser);
+        String proxyUrl = "proxies/" + proxy.getId() + "/download";
 
         ServiceWizardResponse response = new ServiceWizardResponse(
                 service.getName(),
@@ -104,8 +102,10 @@ public class AdminController {
                 wizard.getServiceCost(),
                 authenticatedUser.getUsername(),
                 apiKey.getKeyValue(),
-                proxy.getPublicUrl()
+                proxyUrl
         );
+
+
         return new ModelAndView(ADMIN_WIZARD_RESULT)
                 .addObject("wizardResponse", response);
     }
