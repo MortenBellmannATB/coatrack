@@ -84,13 +84,12 @@ public class AdminController {
     public ModelAndView serviceWizard(ServiceWizardForm wizard) {
         User authenticatedUser = userService.getAuthenticatedUser();
         ServiceApi service = serviceApiService.create(wizard, authenticatedUser);
-
         Proxy proxy = proxyService.create(authenticatedUser, service);
         ApiKey apiKey = apiKeyService.create(authenticatedUser, service);
 
         authenticatedUser.setInitialized(Boolean.TRUE);
         authenticatedUser = userService.save(authenticatedUser);
-        String proxyUrl = "proxies/" + proxy.getId() + "/download";
+        String proxyUrl = ADMIN_PROXY + proxy.getId() + "/download";
 
         ServiceWizardResponse response = new ServiceWizardResponse(
                 service.getName(),
