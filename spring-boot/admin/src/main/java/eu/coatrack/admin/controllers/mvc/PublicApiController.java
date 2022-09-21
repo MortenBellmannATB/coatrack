@@ -20,6 +20,7 @@ package eu.coatrack.admin.controllers.mvc;
  * #L%
  */
 
+import eu.coatrack.admin.controllers.admin.ValueConfig;
 import eu.coatrack.admin.service.PublicApiService;
 import eu.coatrack.admin.service.ServiceApiService;
 import eu.coatrack.admin.service.report.ReportService;
@@ -46,8 +47,8 @@ import java.util.List;
 @CrossOrigin(origins = "*", methods = {RequestMethod.GET, RequestMethod.POST})
 public class PublicApiController {
 
-    @Value("${ygg.admin.server.url}")
-    private static String coatrackAdminPublicServerURL;
+    @Autowired
+    private ValueConfig valueConfig;
 
     @Autowired
     private PublicApiService publicApiService;
@@ -96,7 +97,7 @@ public class PublicApiController {
 
             publicApiService.subscribeToService(serviceToSubscribeTo, userWhoSubscribes);
         }
-        return coatrackAdminPublicServerURL + "/admin/api-keys/consumer/list";
+        return valueConfig.getCoatrackAdminPublicServerURL() + "/admin/api-keys/consumer/list";
     }
 
     @GetMapping(value = "services/{serviceOwnerUsername}/{uriIdentifier}/usageStatistics")
