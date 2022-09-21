@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @Slf4j
@@ -33,7 +34,7 @@ public class ApiUsageCalculator {
         }
 
         if (count.getMonthlyBilledCalls() > 0) {
-            int diffMonth = getMonthDifference(apiUsageDTO.getFrom(), apiUsageDTO.getUntil());
+            long diffMonth = ChronoUnit.MONTHS.between(apiUsageDTO.getFrom(), apiUsageDTO.getUntil());
             ApiUsageReport apiUsageReportForMonthlyFlatrate = new ApiUsageReport(
                     "All Calls",
                     count.getMonthlyBilledCalls(),

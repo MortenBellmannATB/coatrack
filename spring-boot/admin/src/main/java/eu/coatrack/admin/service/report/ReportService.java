@@ -8,12 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-
-import static eu.coatrack.admin.utils.DateUtils.getDateFromString;
 
 
 @Slf4j
@@ -43,7 +41,7 @@ public class ReportService {
         return table;
     }
 
-    public double reportTotalRevenueForApiProvider(List<ServiceApi> offeredServices, Date from, Date until) {
+    public double reportTotalRevenueForApiProvider(List<ServiceApi> offeredServices, LocalDate from, LocalDate until) {
         List<ApiUsageReport> apiUsageReportsForAllOfferedServices = new ArrayList<>();
 
         for (ServiceApi service : offeredServices) {
@@ -60,17 +58,6 @@ public class ReportService {
         return apiUsageCalculator.calculateForSpecificService(apiUsageDTO);
     }
 
-    // TODO this has to be changed with AdminController refactoring
-    @Deprecated
-    public double reportTotalRevenueForApiProvider(String apiProviderUsername, LocalDate timePeriodStart, LocalDate timePeriodEnd) {
-        Date from = java.sql.Date.valueOf(timePeriodStart);
-        Date until = java.sql.Date.valueOf(timePeriodEnd);
-
-        // TODO move to ServiceApiService after refactoring admin controller, serviceApiRepository can be moved to AdminController
-        List<ServiceApi> offeredServices = serviceApiRepository.findByOwnerUsername(apiProviderUsername);
-        return reportTotalRevenueForApiProvider(offeredServices, from, until);
-    }
-
 
     public ServiceUsageStatisticsDTO getServiceUsageStatistics(
             String uriIdentifier, String serviceOwnerUsername, String dateFromString, String dateUntilString, User consumer
@@ -78,8 +65,8 @@ public class ReportService {
 
         String authenticatedUserName = SecurityContextHolder.getContext().getAuthentication().getName();
         ServiceApi service = serviceApiRepository.findServiceApiByServiceOwnerAndUriIdentifier(serviceOwnerUsername, uriIdentifier);
-        Date from = getDateFromString(dateFromString);
-        Date until = getDateFromString(dateUntilString);
+        LocalDate from = LocalDate.parse(dateFromString);
+        LocalDate until = LocalDate.parse(dateUntilString);
 
         ApiUsageDTO apiUsageDTO = new ApiUsageDTO(service, null, from, until, true, false);
 

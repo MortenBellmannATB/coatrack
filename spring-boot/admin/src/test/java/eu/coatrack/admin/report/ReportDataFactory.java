@@ -5,6 +5,7 @@ import eu.coatrack.admin.service.report.CallCount;
 import eu.coatrack.api.*;
 import lombok.Getter;
 
+import java.time.LocalDate;
 import java.util.*;
 
 import static eu.coatrack.admin.utils.DateUtils.getDateFromString;
@@ -56,7 +57,7 @@ public class ReportDataFactory {
 
     public final static List<String> payPerCallServiceIds = Arrays.asList("1", "2", "3");
 
-    public final static long selectedServiceId = -1L;
+    public final static long selectedServiceId = 1L;
     public final static long selectedApiConsumerUserId = -1L;
     public final static boolean considerOnlyPaidCalls = false;
 
@@ -71,12 +72,12 @@ public class ReportDataFactory {
         return serviceDummy;
     }
     public static ApiUsageDTO getApiUsageDTO(String fromString, ServiceAccessPaymentPolicy accessPaymentPolicy) {
-        Date from = getDateFromString(fromString);
+        LocalDate from = LocalDate.parse(fromString);
         ApiUsageDTO apiUsageDTO = new ApiUsageDTO(
                 getServiceApi(1L, accessPaymentPolicy, 100.0),
                 getUser(1L, "Consumer, simple"),
                 from,
-                new Date(), // TODO this can be a problem
+                LocalDate.now(),
                 false,
                 false
         );

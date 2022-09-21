@@ -9,9 +9,9 @@ package eu.coatrack.admin.service;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,13 +20,20 @@ package eu.coatrack.admin.service;
  * #L%
  */
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+
+import eu.coatrack.api.User;
+import eu.coatrack.config.github.GithubEmail;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
@@ -50,6 +57,9 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+
+import static eu.coatrack.admin.utils.PathProvider.GITHUB_API_EMAIL;
+import static eu.coatrack.admin.utils.PathProvider.GITHUB_API_USER;
 
 /**
  *
@@ -257,6 +267,56 @@ public class GithubService {
         }
 
         return rawQueryList;
+    }
+
+    public User getUserInfoViaGithub(Object authenticationDetails) throws JsonProcessingException {
+        OAuth2AuthenticationDetails details = (OAuth2AuthenticationDetails) authenticationDetails;
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "token " + details.getTokenValue());
+        HttpEntity<String> githubRequest = new HttpEntity<>(headers);
+        ResponseEntity<String> userInfoResponse =  restTemplate.exchange(GITHUB_API_USER, HttpMethod.GET, githubRequest, String.class);
+        String userInfo = userInfoResponse.getBody();
+
+
+        TypeReference<Map<String, Object>> typeRef = new TypeReference<Map<String, Object>>() {};
+        Map<String, Object> userMap = objectMapper.readValue(userInfo, typeRef);
+
+        String email = (String) userMap.get("email");
+        if (email == null || email.isEmpty()) {
+
+            ResponseEntity<String> userEmailsResponse = restTemplate.exchange(GITHUB_API_EMAIL, HttpMethod.GET,
+                    githubRequest, String.class);
+            String userEmails = userEmailsResponse.getBody();
+            List<GithubEmail> emailsList = objectMapper.readValue(userEmails,
+                    objectMapper.getTypeFactory().constructCollectionType(List.class, GithubEmail.class));
+
+            Iterator<GithubEmail> it = emailsList.iterator();
+            boolean found = false;
+            if (emailsList.size() > 0) {
+                while (!found && it.hasNext()) {
+                    GithubEmail githubEmail = it.next();
+                    if (githubEmail.getVerified()) {
+                        email = githubEmail.getEmail();
+                        found = true;
+                    }
+                }
+                if (!found) {
+                    email = emailsList.get(0).getEmail();
+                }
+            }
+        }
+
+        User user = new User();
+        user.setUsername((String) userMap.get("login"));
+        user.setFirstname((String) userMap.get("name"));
+        user.setCompany((String) userMap.get("company"));
+
+        if (email != null) {
+            user.setEmail(email);
+        }
+        return user;
     }
 
 }

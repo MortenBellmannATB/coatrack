@@ -7,6 +7,8 @@ import eu.coatrack.admin.service.report.ReportService;
 import eu.coatrack.api.ApiUsageReport;
 import eu.coatrack.api.DataTableView;
 import org.junit.jupiter.api.Test;
+
+import java.time.LocalDate;
 import java.util.Date;
 import static eu.coatrack.admin.report.ReportDataFactory.*;
 import static eu.coatrack.admin.utils.DateUtils.getTodayLastMonthAsString;
@@ -44,7 +46,7 @@ public class ReportServiceTest {
 
     @Test
     public void reportTotalRevenueForApiProvider() {
-        double res = reportService.reportTotalRevenueForApiProvider(serviceApis, new Date(), new Date());
+        double res = reportService.reportTotalRevenueForApiProvider(serviceApis, LocalDate.now(), LocalDate.now());
 
         assertEquals(600.0, res);
     }

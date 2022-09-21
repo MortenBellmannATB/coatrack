@@ -1,4 +1,4 @@
-package eu.coatrack.admin.controllers;
+package eu.coatrack.admin.controllers.mvc;
 
 /*-
  * #%L
@@ -9,9 +9,9 @@ package eu.coatrack.admin.controllers;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -97,11 +97,11 @@ public class AdminServicesController {
 
     @Autowired
     private CreateApiKeyAction createApiKeyAction;
-    
+
     private int ADMIN_SERVICE_ADD_MODE =0;
-    
+
 private int ADMIN_SERVICE_UPDATE_MODE =1;
-    
+
     @RequestMapping(value = "", method = GET)
     public ModelAndView serviceListPage() {
         ModelAndView mav = new ModelAndView();
@@ -135,14 +135,14 @@ private int ADMIN_SERVICE_UPDATE_MODE =1;
         mav.setViewName(ADMIN_SERVICE_CREATE);
         return mav;
     }
-    
+
     @GetMapping(value = "{id}/servicecover")
     public ModelAndView updateServiceCoverForm(@PathVariable("id") long id) {
         log.debug("Update Service");
 
         ModelAndView mav = new ModelAndView();
         mav.addObject("service", serviceApiRepository.findById(id).orElse(null));
-       
+
         mav.setViewName(ADMIN_SERVICE_COVER_EDITOR);
         return mav;
     }

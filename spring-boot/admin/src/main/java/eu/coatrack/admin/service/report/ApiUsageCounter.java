@@ -14,6 +14,7 @@ import org.springframework.util.AntPathMatcher;
 import java.util.Date;
 import java.util.List;
 
+import static eu.coatrack.admin.utils.DateUtils.localDateToDate;
 import static eu.coatrack.api.MetricType.RESPONSE;
 import static eu.coatrack.api.ServiceAccessPaymentPolicy.*;
 
@@ -34,12 +35,12 @@ public class ApiUsageCounter {
         Long serviceId = apiUsageDTO.getService().getId();
         String ownerName = apiUsageDTO.getService().getOwner().getUsername();
         Long consumerId = apiUsageDTO.getConsumer() != null ? apiUsageDTO.getConsumer().getId() : -1L;
-        Date from = apiUsageDTO.getFrom();
-        Date until = apiUsageDTO.getUntil();
+        Date from = localDateToDate(apiUsageDTO.getFrom());
+        Date until = localDateToDate(apiUsageDTO.getUntil());
 
 
-        List metricResults = metricsAggregationCustomRepository.getUsageApiConsumer(
-                RESPONSE, serviceId, ownerName, consumerId, from, until,true);
+        List metricResults = metricsAggregationCustomRepository.getUsageApiConsumer
+                (RESPONSE, serviceId, ownerName, consumerId, from, until, true);
 
         if (metricResults != null && !metricResults.isEmpty()) {
             metricResults.forEach(metricResult -> evaluateMetric(metricResult, apiUsageDTO, callCount));

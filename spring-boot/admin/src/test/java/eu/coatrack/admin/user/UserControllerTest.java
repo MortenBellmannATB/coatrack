@@ -1,10 +1,8 @@
 package eu.coatrack.admin.user;
 
 import eu.coatrack.admin.config.TestConfiguration;
-import eu.coatrack.admin.controllers.UserController;
-import eu.coatrack.admin.model.repository.UserRepository;
-import eu.coatrack.api.User;
-import lombok.SneakyThrows;
+import eu.coatrack.admin.controllers.mvc.UserController;
+import eu.coatrack.admin.service.user.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,11 +12,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 
 import java.util.Collections;
-import java.util.Optional;
 
 import static eu.coatrack.admin.report.ReportDataFactory.consumer;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -34,16 +29,16 @@ public class UserControllerTest {
 
     private final UserController userController;
 
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final MockMvc mvc;
     private final static String basePath = "";
 
     public UserControllerTest() {
-        userRepository = mock(UserRepository.class);
+        userService = mock(UserService.class);
 
-        doReturn(Optional.of(user)).when(userRepository).findById(anyLong());
+        doReturn(user).when(userService).findById(anyLong());
 
-        userController = new UserController(userRepository);
+        userController = new UserController(userService);
 
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ADMIN");
         Authentication authentication = new UsernamePasswordAuthenticationToken(consumer.getUsername(), "PetesPassword", Collections.singletonList(authority));
