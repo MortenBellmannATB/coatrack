@@ -119,18 +119,4 @@ public class AdminControllerTest {
                 .andExpect(model().attribute("gatewayHealthMonitorProxyData", dataForHealthMonitor));
     }
 
-    @Test
-    public void gettingStatedWizard() {
-        // mvc.perform(...)
-    }
-
-    @Test
-    public void goProfiles() {
-        // mvc.perform(...)
-    }
-
-    @Test
-    public void serviceWizard() {
-        // mvc.perform(...)
-    }
 }
