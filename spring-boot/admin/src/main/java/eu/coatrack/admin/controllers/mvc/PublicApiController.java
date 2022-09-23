@@ -114,7 +114,8 @@ public class PublicApiController {
         User authenticatedUser = userService.getAuthenticatedUser();
 
         if(authenticatedUser != null) {
-            dto = reportService.getServiceUsageStatistics(uriIdentifier, serviceOwnerUsername, dateFrom, dateUntil, authenticatedUser);
+            ServiceApi service = serviceApiService.findServiceApiByServiceOwnerAndUriIdentifier(serviceOwnerUsername, uriIdentifier);
+            dto = reportService.getServiceUsageStatistics(service, dateFrom, dateUntil, authenticatedUser);
         }
         return dto;
     }
