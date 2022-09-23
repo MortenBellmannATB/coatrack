@@ -7,7 +7,6 @@ import be.ceau.chart.data.DoughnutData;
 import be.ceau.chart.data.LineData;
 import be.ceau.chart.dataset.DoughnutDataset;
 import be.ceau.chart.dataset.LineDataset;
-import be.ceau.chart.enums.PointStyle;
 import be.ceau.chart.options.LineOptions;
 import be.ceau.chart.options.scales.LinearScale;
 import be.ceau.chart.options.scales.LinearScales;
@@ -16,36 +15,25 @@ import eu.coatrack.admin.model.vo.StatisticsPerApiUser;
 import eu.coatrack.admin.model.vo.StatisticsPerDay;
 import eu.coatrack.admin.model.vo.StatisticsPerHttpStatusCode;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
+import static be.ceau.chart.color.Color.*;
+import static be.ceau.chart.enums.PointStyle.CIRCLE;
+
 
 @Service
 public class ChartService {
-    private static final Map<Integer, Color> chartColorsPerHttpResponseCode;
 
     @Autowired
     private MetricService metricService;
 
-    static {
-        Map<Integer, Color> colorMap = new HashMap<>();
-        colorMap.put(400, Color.ORANGE);
-        colorMap.put(401, Color.SALMON);
-        colorMap.put(403, Color.LIGHT_YELLOW);
-        colorMap.put(404, new Color(255, 255, 102)); // yellow
-        colorMap.put(500, Color.RED);
-        colorMap.put(503, Color.ORANGE_RED);
-        colorMap.put(504, Color.DARK_RED);
-        chartColorsPerHttpResponseCode = Collections.unmodifiableMap(colorMap);
-    }
+    @Autowired
+    private ColorService colorService;
 
     public DoughnutChart generateHttpResponseStatisticsDoughnutChart(LocalDate from, LocalDate until, String apiProviderUsername) {
         DoughnutChart chart = new DoughnutChart();
@@ -56,10 +44,7 @@ public class ChartService {
         chart.setData(data);
 
         if (statisticsPerHttpStatusCodeList.size() > 0) {
-            List<Color> chartColors = new ArrayList<>();
-
-            statisticsPerHttpStatusCodeList.forEach(statistic ->
-                    chartColors.add(getColorForStatusCode(statistic.getStatusCode())));
+            List<Color> chartColors = colorService.getChartColorsForStatisticsPerHttpStatusCodeList(statisticsPerHttpStatusCodeList);
 
             dataset.setLabel("HTTP response codes")
                     .addBackgroundColors(chartColors.toArray(new Color[0]))
@@ -71,34 +56,17 @@ public class ChartService {
         return chart;
     }
 
-    private Color getColorForStatusCode(int statusCode) {
-        Color colorForStatusCode = chartColorsPerHttpResponseCode.get(statusCode);
-        if (colorForStatusCode != null)
-            if (statusCode >= 200 && statusCode < 300) {
-                colorForStatusCode = new Color(0, 204, 0);  // lighter green
-            } else if (statusCode >= 300 && statusCode < 400) {
-                colorForStatusCode = Color.LIGHT_BLUE;
-            } else if (statusCode >= 404 && statusCode < 500) {
-                colorForStatusCode = Color.DARK_ORANGE;
-            } else if (statusCode >= 500 && statusCode < 600) {
-                colorForStatusCode = new Color(255, 51, 51);    // red
-            } else {
-                colorForStatusCode = Color.LIGHT_GRAY;
-            }
-        return colorForStatusCode;
-    }
-
     public DoughnutChart generateUserStatisticsDoughnutChart(LocalDate from, LocalDate until, String apiProviderUsername) {
         List<StatisticsPerApiUser> userStatsList = metricService.getStatisticsPerApiConsumer(from, until, apiProviderUsername);
         DoughnutDataset dataset = new DoughnutDataset()
                 .setLabel("API calls")
                 .setBorderWidth(2)
                 .addBackgroundColors(
-                        Color.AQUA_MARINE,
-                        Color.LIGHT_BLUE,
-                        Color.LIGHT_SALMON,
-                        Color.LIGHT_BLUE,
-                        Color.GRAY
+                        AQUA_MARINE,
+                        LIGHT_BLUE,
+                        LIGHT_SALMON,
+                        LIGHT_BLUE,
+                        GRAY
                 );
 
         DoughnutData data = new DoughnutData().addDataset(dataset);
@@ -133,14 +101,14 @@ public class ChartService {
     private static LineDataset getDefaultLineDataSet(String label) {
         return new LineDataset()
                 .setLabel(label)
-                .setBackgroundColor(Color.LIGHT_YELLOW)
+                .setBackgroundColor(LIGHT_YELLOW)
                 .setBorderWidth(3)
-                .addPointStyle(PointStyle.CIRCLE)
+                .addPointStyle(CIRCLE)
                 .addPointBorderWidth(2)
                 .setLineTension(0f)
                 .setSteppedLine(false)
-                .addPointBackgroundColor(Color.LIGHT_YELLOW)
-                .addPointBorderColor(Color.LIGHT_GRAY);
+                .addPointBackgroundColor(LIGHT_YELLOW)
+                .addPointBorderColor(LIGHT_GRAY);
     }
 
     private Map<LocalDate, Long> getCallsPerDay(LocalDate from, LocalDate until) {
