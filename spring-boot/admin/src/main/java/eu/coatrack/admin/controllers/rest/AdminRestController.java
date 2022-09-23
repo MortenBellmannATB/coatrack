@@ -93,8 +93,8 @@ public class AdminRestController {
     @GetMapping(value = "/userStatsDoughnutChart", produces = "application/json")
     @ResponseBody
     public DoughnutChart generateUserStatisticsDoughnutChart(
-            @RequestParam("from") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
-            @RequestParam("until") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate until
+            @RequestParam("dateFrom") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam("dateUntil") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate until
     ) {
         DoughnutChart chart = new DoughnutChart();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

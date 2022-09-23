@@ -3,7 +3,7 @@ package eu.coatrack.admin.utils;
 public class PathProvider {
     public static final String
             ADMIN_BASE_PATH = "/admin",
-            ADMIN_HOME_VIEW = "admin/dashboard",
+            ADMIN_HOME = "admin/dashboard",
             ADMIN_CONSUMER_HOME_VIEW = "admin/consumer_dashboard",
             ADMIN_WIZARD_VIEW = "admin/wizard/wizard",
             ADMIN_STARTPAGE = "admin/startpage",

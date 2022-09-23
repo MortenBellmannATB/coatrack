@@ -52,7 +52,8 @@ public class ChartService {
         List<StatisticsPerHttpStatusCode> statisticsPerHttpStatusCodeList = metricService
                 .getNoOfCallsPerHttpResponseCode(from, until, apiProviderUsername);
         DoughnutDataset dataset = new DoughnutDataset();
-        DoughnutData data = chart.getData().addDataset(dataset);
+        DoughnutData data = new DoughnutData().addDataset(dataset);
+        chart.setData(data);
 
         if (statisticsPerHttpStatusCodeList.size() > 0) {
             List<Color> chartColors = new ArrayList<>();

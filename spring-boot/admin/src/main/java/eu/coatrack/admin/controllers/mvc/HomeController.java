@@ -151,7 +151,7 @@ public class HomeController {
             List<StatisticsPerApiUser> statisticsPerConsumer = metricService.getStatisticsPerApiConsumer
                     (from, until, user.getUsername());
 
-            mav.setViewName(ADMIN_HOME_VIEW);
+            mav.setViewName(ADMIN_HOME);
             mav.addObject("stats", generalStatistics);
             mav.addObject("userStatistics", statisticsPerConsumer);
         } else {
