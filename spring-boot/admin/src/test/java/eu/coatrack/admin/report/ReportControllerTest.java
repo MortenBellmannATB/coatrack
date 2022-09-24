@@ -5,6 +5,7 @@ import eu.coatrack.admin.config.TestConfiguration;
 import eu.coatrack.admin.model.repository.ApiKeyRepository;
 import eu.coatrack.admin.model.repository.ServiceApiRepository;
 import eu.coatrack.admin.model.repository.UserRepository;
+import eu.coatrack.admin.service.ServiceApiService;
 import eu.coatrack.admin.service.report.ReportService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -36,8 +37,7 @@ public class ReportControllerTest {
     private final ReportController reportController;
 
     private final UserRepository userRepository;
-    private final ServiceApiRepository serviceApiRepository;
-    private final ApiKeyRepository apiKeyRepository;
+    private final ServiceApiService serviceApiService;
     private final ReportService reportService;
 
     private final MockMvc mvc;
@@ -45,13 +45,12 @@ public class ReportControllerTest {
 
     public ReportControllerTest() {
         userRepository = mock(UserRepository.class);
-        serviceApiRepository = mock(ServiceApiRepository.class);
-        apiKeyRepository = mock(ApiKeyRepository.class);
+        serviceApiService = mock(ServiceApiService.class);
         reportService = mock(ReportService.class);
 
         doReturn(consumer).when(userRepository).findByUsername(anyString());
 
-        reportController = new ReportController(userRepository, serviceApiRepository, apiKeyRepository, reportService);
+        reportController = new ReportController(userRepository, serviceApiService, reportService);
 
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ADMIN");
         Authentication authentication = new UsernamePasswordAuthenticationToken(consumer.getUsername(), "PetesPassword", Collections.singletonList(authority));
@@ -62,9 +61,9 @@ public class ReportControllerTest {
 
     @Test
     public void reportWithoutParam() throws Exception {
-        doReturn(serviceApis).when(serviceApiRepository).findByDeletedWhen(null);
-        doReturn(consumers).when(reportService).getServiceConsumers(anyList());
-        doReturn(payPerCallServiceIds).when(reportService).getPayPerCallServicesIds(anyList());
+        doReturn(serviceApis).when(serviceApiService).findIfNotDeleted();
+        doReturn(consumers).when(serviceApiService).getServiceConsumers(anyList());
+        doReturn(payPerCallServiceIds).when(serviceApiService).getPayPerCallServicesIds(anyList());
 
         mvc.perform(get(basePath))
                 .andDo(print())
@@ -86,9 +85,9 @@ public class ReportControllerTest {
 
     @Test
     public void reportWithParam() throws Exception {
-        doReturn(serviceApis).when(serviceApiRepository).findByDeletedWhen(null);
-        doReturn(consumers).when(reportService).getServiceConsumers(anyList());
-        doReturn(payPerCallServiceIds).when(reportService).getPayPerCallServicesIds(anyList());
+        doReturn(serviceApis).when(serviceApiService).findIfNotDeleted();
+        doReturn(consumers).when(serviceApiService).getServiceConsumers(anyList());
+        doReturn(payPerCallServiceIds).when(serviceApiService).getPayPerCallServicesIds(anyList());
 
         String query = String.format("%s/%s/%s/%d/%d/%b",
                 basePath,
@@ -119,10 +118,10 @@ public class ReportControllerTest {
 
     @Test
     public void showGenerateReportPageForServiceConsumer() throws Exception {
-        doReturn(serviceApis).when(serviceApiRepository).findByApiKeyList(anyList());
-        doReturn(Optional.of(serviceApis.get(0))).when(serviceApiRepository).findById(anyLong());
-        doReturn(payPerCallServiceIds).when(reportService).getPayPerCallServicesIds(anyList());
-        doReturn(consumers).when(reportService).getServiceConsumers(anyList());
+        doReturn(serviceApis).when(serviceApiService).findFromActiveUser();
+        doReturn(serviceApis.get(0)).when(serviceApiService).findById(anyLong());
+        doReturn(payPerCallServiceIds).when(serviceApiService).getPayPerCallServicesIds(anyList());
+        doReturn(consumers).when(serviceApiService).getServiceConsumers(anyList());
 
         mvc.perform(get(basePath + "/consumer"))
                 .andDo(print())
@@ -142,10 +141,10 @@ public class ReportControllerTest {
 
     @Test
     public void searchReportsByServicesConsumed() throws Exception {
-        doReturn(serviceApis).when(serviceApiRepository).findByApiKeyList(anyList());
-        doReturn(Optional.of(serviceApis.get(0))).when(serviceApiRepository).findById(anyLong());
-        doReturn(payPerCallServiceIds).when(reportService).getPayPerCallServicesIds(anyList());
-        doReturn(consumers).when(reportService).getServiceConsumers(anyList());
+        doReturn(serviceApis).when(serviceApiService).findFromActiveUser();
+        doReturn(serviceApis.get(0)).when(serviceApiService).findById(anyLong());
+        doReturn(payPerCallServiceIds).when(serviceApiService).getPayPerCallServicesIds(anyList());
+        doReturn(consumers).when(serviceApiService).getServiceConsumers(anyList());
 
         String query = String.format("%s/consumer/%s/%s/%d/%b",
                 basePath,
