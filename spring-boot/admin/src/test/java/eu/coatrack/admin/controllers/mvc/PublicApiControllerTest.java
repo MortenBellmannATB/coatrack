@@ -1,8 +1,7 @@
-package eu.coatrack.admin.publicapi;
+package eu.coatrack.admin.controllers.mvc;
 
 import eu.coatrack.admin.config.TestConfiguration;
 import eu.coatrack.admin.config.ValueConfig;
-import eu.coatrack.admin.controllers.mvc.PublicApiController;
 import eu.coatrack.admin.service.PublicApiService;
 import eu.coatrack.admin.service.ServiceApiService;
 import eu.coatrack.admin.service.report.ReportService;
@@ -19,9 +18,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Collections;
 
-import static eu.coatrack.admin.publicapi.PublicApiDataFactory.serviceOwner;
-import static eu.coatrack.admin.publicapi.PublicApiDataFactory.uriIdentifier;
-import static eu.coatrack.admin.report.ReportDataFactory.consumer;
+import static eu.coatrack.admin.data.PublicApiDataFactory.serviceOwner;
+import static eu.coatrack.admin.data.PublicApiDataFactory.uriIdentifier;
+import static eu.coatrack.admin.data.ReportDataFactory.consumer;
 import static eu.coatrack.admin.utils.DateUtils.getTodayAsString;
 import static eu.coatrack.admin.utils.DateUtils.getTodayLastMonthAsString;
 import static org.mockito.Mockito.mock;

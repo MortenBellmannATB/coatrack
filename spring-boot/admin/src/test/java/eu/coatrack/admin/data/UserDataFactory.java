@@ -1,4 +1,4 @@
-package eu.coatrack.admin.user;
+package eu.coatrack.admin.data;
 
 import eu.coatrack.api.User;
 

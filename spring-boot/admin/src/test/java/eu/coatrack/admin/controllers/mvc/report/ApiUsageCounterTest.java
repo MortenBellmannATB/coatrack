@@ -1,5 +1,6 @@
-package eu.coatrack.admin.report;
+package eu.coatrack.admin.controllers.mvc.report;
 
+import eu.coatrack.admin.data.ReportDataFactory;
 import eu.coatrack.admin.model.repository.MetricsAggregationCustomRepository;
 import eu.coatrack.admin.service.report.ApiUsageCounter;
 import eu.coatrack.admin.service.report.ApiUsageDTO;
@@ -7,7 +8,7 @@ import eu.coatrack.admin.service.report.CallCount;
 import eu.coatrack.api.MetricType;
 import org.junit.jupiter.api.Test;
 import java.util.*;
-import static eu.coatrack.admin.report.ReportDataFactory.*;
+import static eu.coatrack.admin.data.ReportDataFactory.*;
 import static eu.coatrack.admin.utils.DateUtils.getTodayLastMonthAsString;
 import static eu.coatrack.api.ServiceAccessPaymentPolicy.MONTHLY_FEE;
 import static eu.coatrack.api.ServiceAccessPaymentPolicy.WELL_DEFINED_PRICE;

@@ -1,4 +1,4 @@
-package eu.coatrack.admin.admin;
+package eu.coatrack.admin.data;
 
 import eu.coatrack.admin.model.GeneralStats;
 import eu.coatrack.admin.model.vo.StatisticsPerApiUser;

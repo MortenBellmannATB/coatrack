@@ -1,4 +1,4 @@
-package eu.coatrack.admin;
+package eu.coatrack.admin.config;
 
 /*-
  * #%L

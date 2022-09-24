@@ -1,4 +1,4 @@
-package eu.coatrack.admin.report;
+package eu.coatrack.admin.controllers.mvc.report;
 
 import eu.coatrack.admin.controllers.mvc.ReportController;
 import eu.coatrack.admin.config.TestConfiguration;
@@ -18,7 +18,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.time.LocalDate;
 import java.util.Collections;
 
-import static eu.coatrack.admin.report.ReportDataFactory.*;
+import static eu.coatrack.admin.data.ReportDataFactory.*;
 import static eu.coatrack.admin.utils.DateUtils.*;
 import static eu.coatrack.admin.utils.PathProvider.REPORT_BASE_PATH;
 import static eu.coatrack.admin.utils.PathProvider.REPORT_VIEW;

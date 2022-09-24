@@ -1,4 +1,4 @@
-package eu.coatrack.admin.report;
+package eu.coatrack.admin.controllers.mvc.report;
 
 import eu.coatrack.admin.model.repository.ServiceApiRepository;
 import eu.coatrack.admin.service.report.ApiUsageCalculator;
@@ -9,8 +9,8 @@ import eu.coatrack.api.DataTableView;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
-import java.util.Date;
-import static eu.coatrack.admin.report.ReportDataFactory.*;
+
+import static eu.coatrack.admin.data.ReportDataFactory.*;
 import static eu.coatrack.admin.utils.DateUtils.getTodayLastMonthAsString;
 import static eu.coatrack.api.ServiceAccessPaymentPolicy.WELL_DEFINED_PRICE;
 import static org.junit.jupiter.api.Assertions.assertEquals;

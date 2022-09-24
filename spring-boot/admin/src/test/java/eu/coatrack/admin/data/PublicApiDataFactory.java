@@ -1,4 +1,4 @@
-package eu.coatrack.admin.publicapi;
+package eu.coatrack.admin.data;
 
 import eu.coatrack.api.ApiUsageReport;
 import eu.coatrack.api.ServiceApi;

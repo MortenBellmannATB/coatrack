@@ -1,7 +1,6 @@
-package eu.coatrack.admin.user;
+package eu.coatrack.admin.controllers.mvc;
 
 import eu.coatrack.admin.config.TestConfiguration;
-import eu.coatrack.admin.controllers.mvc.UserController;
 import eu.coatrack.admin.service.user.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -15,11 +14,11 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Collections;
 
-import static eu.coatrack.admin.report.ReportDataFactory.consumer;
+import static eu.coatrack.admin.data.ReportDataFactory.consumer;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static eu.coatrack.admin.user.UserDataFactory.*;
+import static eu.coatrack.admin.data.UserDataFactory.*;
 import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
