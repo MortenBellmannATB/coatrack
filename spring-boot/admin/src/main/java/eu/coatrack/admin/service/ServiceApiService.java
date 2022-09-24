@@ -123,16 +123,16 @@ public class ServiceApiService  implements InitializingBean {
        return serviceApiRepository.findByApiKeyList(apiKeyRepository.findByLoggedInAPIConsumer());
     }
 
-    public List<ServiceApi> findServicesByOwnerUsername(String name) {
-        return serviceApiRepository.findByOwnerUsername(name);
-    }
-
     public List<ServiceApi> findIfNotDeleted() {
         return serviceApiRepository.findByDeletedWhen(null);
     }
 
     public ServiceApiDTO findByServiceOwnerAndUriIdentifier(String uriIdentifier, String serviceOwnerUsername) {
         return toDTO(serviceApiRepository.findServiceApiByServiceOwnerAndUriIdentifier(serviceOwnerUsername, uriIdentifier));
+    }
+
+    public List<ServiceApi> findByOwnerUsername(String apiProviderUsername) {
+        return serviceApiRepository.findByOwnerUsername(apiProviderUsername);
     }
 
     public List<ServiceApiDTO> findByServiceOwner(String authenticatedUserName) {
@@ -159,4 +159,6 @@ public class ServiceApiService  implements InitializingBean {
         serviceDTO.setServiceOwnerUsername(entity.getOwner().getUsername());
         return serviceDTO;
     }
+
+
 }

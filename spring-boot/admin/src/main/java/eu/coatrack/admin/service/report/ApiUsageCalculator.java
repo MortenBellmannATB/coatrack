@@ -56,18 +56,4 @@ public class ApiUsageCalculator {
         apiUsageReports.forEach(reportRow -> log.debug("row for report: " + reportRow));
         return apiUsageReports;
     }
-
-    private static int getMonthDifference(Date from, Date until) {
-        Calendar startCalendar = new GregorianCalendar();
-        startCalendar.setTime(from);
-        Calendar endCalendar = new GregorianCalendar();
-        endCalendar.setTime(until);
-        int diffYear = endCalendar.get(Calendar.YEAR) - startCalendar.get(Calendar.YEAR);
-        int diffMonth = diffYear * 12 + endCalendar.get(Calendar.MONTH) - startCalendar.get(Calendar.MONTH);
-        return diffMonth;
-    }
-
-    public void setCounter(ApiUsageCounter counter) {
-        this.counter = counter;
-    }
 }

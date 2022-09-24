@@ -60,17 +60,15 @@ public class ReportService {
 
 
     public ServiceUsageStatisticsDTO getServiceUsageStatistics(
-            String uriIdentifier, String serviceOwnerUsername, String dateFromString, String dateUntilString, User consumer
+            ServiceApi service, String dateFromString, String dateUntilString, User consumer
     ) {
-
         String authenticatedUserName = SecurityContextHolder.getContext().getAuthentication().getName();
-        ServiceApi service = serviceApiRepository.findServiceApiByServiceOwnerAndUriIdentifier(serviceOwnerUsername, uriIdentifier);
         LocalDate from = LocalDate.parse(dateFromString);
         LocalDate until = LocalDate.parse(dateUntilString);
 
         ApiUsageDTO apiUsageDTO = new ApiUsageDTO(service, null, from, until, true, false);
 
-        if (!serviceOwnerUsername.equals(authenticatedUserName)) {
+        if (!service.getOwner().getUsername().equals(authenticatedUserName)) {
             apiUsageDTO.setConsumer(consumer);
         }
 
@@ -82,7 +80,7 @@ public class ReportService {
                 numberOfCalls,
                 dateFromString,
                 dateUntilString,
-                uriIdentifier,
+                service.getUriIdentifier(),
                 service.getOwner().getUsername()
         );
 

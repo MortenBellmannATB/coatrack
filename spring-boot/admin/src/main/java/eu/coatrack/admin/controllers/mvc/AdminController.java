@@ -20,27 +20,22 @@ package eu.coatrack.admin.controllers.mvc;
  * #L%
  */
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import eu.coatrack.admin.UserSessionSettings;
-import eu.coatrack.admin.components.WebUI;
-import eu.coatrack.admin.model.GeneralStats;
-import eu.coatrack.admin.model.vo.*;
-import eu.coatrack.admin.service.*;
+import eu.coatrack.admin.model.vo.ServiceWizardForm;
+import eu.coatrack.admin.model.vo.ServiceWizardResponse;
+import eu.coatrack.admin.service.ApiKeyService;
+import eu.coatrack.admin.service.GatewayHealthMonitorService;
+import eu.coatrack.admin.service.ProxyService;
+import eu.coatrack.admin.service.ServiceApiService;
 import eu.coatrack.admin.service.user.UserService;
-import eu.coatrack.api.*;
+import eu.coatrack.api.ApiKey;
+import eu.coatrack.api.Proxy;
+import eu.coatrack.api.ServiceApi;
+import eu.coatrack.api.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringBootVersion;
-import org.springframework.core.SpringVersion;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-
-import java.io.IOException;
-import java.time.LocalDate;
-import java.util.*;
 
 import static eu.coatrack.admin.utils.PathProvider.*;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
