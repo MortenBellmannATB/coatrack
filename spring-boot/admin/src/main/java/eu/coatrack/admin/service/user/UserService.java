@@ -56,6 +56,18 @@ public class UserService {
             sendVerificationEmail(user);
     }
 
+
+    public User save(User user) {
+        return userRepository.save(user);
+    }
+
+    public User findById(long userId) {
+        return userRepository.findById(userId).orElse(null);
+    }
+
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
     public void verifyUserViaVerificationCode(long userId, String emailVerificationCode) {
         User user = findById(userId);
 
@@ -63,10 +75,6 @@ public class UserService {
             user.setEmailVerified(TRUE);
             userRepository.save(user);
         }
-    }
-
-    public User findById(long userId) {
-        return userRepository.findById(userId).orElse(null);
     }
 
     private void sendVerificationEmail(User user) {
@@ -113,4 +121,5 @@ public class UserService {
                 + "<p>Coatrack Team</p>", true);
         return message;
     }
+
 }

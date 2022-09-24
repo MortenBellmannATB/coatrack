@@ -1,4 +1,4 @@
-package eu.coatrack.admin.controllers;
+package eu.coatrack.admin.controllers.mvc;
 
 /*-
  * #%L
@@ -26,7 +26,6 @@ import eu.coatrack.admin.model.repository.ServiceApiRepository;
 import eu.coatrack.api.ApiKey;
 import eu.coatrack.api.Proxy;
 import eu.coatrack.api.ServiceApi;
-import javassist.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

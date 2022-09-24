@@ -1,4 +1,4 @@
-package eu.coatrack.admin.controllers;
+package eu.coatrack.admin.controllers.mvc;
 
 /*-
  * #%L
@@ -20,6 +20,7 @@ package eu.coatrack.admin.controllers;
  * #L%
  */
 
+import eu.coatrack.admin.config.ValueConfig;
 import eu.coatrack.admin.service.PublicApiService;
 import eu.coatrack.admin.service.ServiceApiService;
 import eu.coatrack.admin.service.report.ReportService;
@@ -31,7 +32,6 @@ import eu.coatrack.api.User;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -46,8 +46,8 @@ import java.util.List;
 @CrossOrigin(origins = "*", methods = {RequestMethod.GET, RequestMethod.POST})
 public class PublicApiController {
 
-    @Value("${ygg.admin.server.url}")
-    private static String coatrackAdminPublicServerURL;
+    @Autowired
+    private ValueConfig valueConfig;
 
     @Autowired
     private PublicApiService publicApiService;
@@ -96,7 +96,7 @@ public class PublicApiController {
 
             publicApiService.subscribeToService(serviceToSubscribeTo, userWhoSubscribes);
         }
-        return coatrackAdminPublicServerURL + "/admin/api-keys/consumer/list";
+        return valueConfig.getCoatrackAdminPublicServerURL() + "/admin/api-keys/consumer/list";
     }
 
     @GetMapping(value = "services/{serviceOwnerUsername}/{uriIdentifier}/usageStatistics")

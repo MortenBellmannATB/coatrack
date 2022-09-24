@@ -1,4 +1,4 @@
-package eu.coatrack.admin.controllers;
+package eu.coatrack.admin.controllers.mvc;
 
 /*-
  * #%L
@@ -35,9 +35,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
-import static eu.coatrack.admin.utils.DateUtils.getLocalDateOrTodayIfNull;
+import static eu.coatrack.admin.utils.DateUtils.parseDateStringOrGetTodayIfNull;
+import static eu.coatrack.admin.utils.PathProvider.REPORT_VIEW;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 @Slf4j
@@ -45,8 +48,6 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 @AllArgsConstructor
 @RequestMapping(path = "/admin/reports")
 public class ReportController {
-
-    public static final String REPORT_VIEW = "admin/reports/report";
 
     @Autowired
     private UserService userService;
@@ -145,8 +146,8 @@ public class ReportController {
     }
 
     private ApiUsageDTO getApiUsageDTO(String dateFrom, String dateUntil, long selectedServiceId, long apiConsumerId, boolean considerOnlyPaidCalls)  {
-        LocalDate from = getLocalDateOrTodayIfNull(dateFrom);
-        LocalDate until = getLocalDateOrTodayIfNull(dateUntil);
+        LocalDate from = parseDateStringOrGetTodayIfNull(dateFrom);
+        LocalDate until = parseDateStringOrGetTodayIfNull(dateUntil);
         ServiceApi selectedService = serviceApiService.findById(selectedServiceId);
         User selectedConsumer = userService.findById(apiConsumerId);
         return new ApiUsageDTO(selectedService, selectedConsumer, from, until, considerOnlyPaidCalls, false);

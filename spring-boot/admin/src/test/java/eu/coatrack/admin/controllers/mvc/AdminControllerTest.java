@@ -1,4 +1,4 @@
-package eu.coatrack.admin.model.vo;
+package eu.coatrack.admin.controllers.mvc;
 
 /*-
  * #%L
@@ -20,29 +20,13 @@ package eu.coatrack.admin.model.vo;
  * #L%
  */
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import eu.coatrack.admin.config.TestConfiguration;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.test.context.ContextConfiguration;
 
-/**
- *
- * @author perezdf
- */
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
-public class ServiceWizardResponse {
-    private String serviceName;
-    private String uriIdentifier;
-    private String serviceUrl;
-    private Boolean serviceForFree;
-    private Boolean monthlyCharge;
-    private Boolean percallCharge;
-    private String serviceCost;
-    private String userName;
-    private String apiKey;
-    private String proxyUrl;
+@ContextConfiguration(classes = TestConfiguration.class)
+@WebMvcTest(AdminController.class)
+public class AdminControllerTest {
+
 }

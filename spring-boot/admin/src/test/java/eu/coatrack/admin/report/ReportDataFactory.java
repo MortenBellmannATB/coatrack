@@ -6,11 +6,9 @@ import eu.coatrack.api.*;
 import lombok.Getter;
 
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
+import static eu.coatrack.admin.utils.DateUtils.getDateFromString;
 import static eu.coatrack.api.MetricType.RESPONSE;
 import static eu.coatrack.api.ServiceAccessPaymentPolicy.MONTHLY_FEE;
 import static eu.coatrack.api.ServiceAccessPaymentPolicy.WELL_DEFINED_PRICE;
@@ -61,7 +59,7 @@ public class ReportDataFactory {
 
     public final static List<String> payPerCallServiceIds = Arrays.asList("1", "2", "3");
 
-    public final static long selectedServiceId = -1L;
+    public final static long selectedServiceId = 1L;
     public final static long selectedApiConsumerUserId = -1L;
     public final static boolean considerOnlyPaidCalls = false;
 

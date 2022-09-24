@@ -1,5 +1,6 @@
 package eu.coatrack.admin.service.report;
 
+import eu.coatrack.admin.model.repository.ServiceApiRepository;
 import eu.coatrack.api.*;
 import lombok.AllArgsConstructor;
 import lombok.Setter;
@@ -13,12 +14,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-
 @Slf4j
 @Service
 @AllArgsConstructor
 @Setter
 public class ReportService {
+    // TODO serviceApi dependency can be moved up by 1 layer, there is no other usage
+    @Deprecated
+    @Autowired
+    private final ServiceApiRepository serviceApiRepository;
+
     @Autowired
     private ApiUsageCalculator apiUsageCalculator;
 
@@ -57,15 +62,13 @@ public class ReportService {
     public ServiceUsageStatisticsDTO getServiceUsageStatistics(
             ServiceApi service, String dateFromString, String dateUntilString, User consumer
     ) {
-
         String authenticatedUserName = SecurityContextHolder.getContext().getAuthentication().getName();
-
         LocalDate from = LocalDate.parse(dateFromString);
         LocalDate until = LocalDate.parse(dateUntilString);
 
         ApiUsageDTO apiUsageDTO = new ApiUsageDTO(service, null, from, until, true, false);
 
-        if (service.getOwner().getUsername().equals(authenticatedUserName)) {
+        if (!service.getOwner().getUsername().equals(authenticatedUserName)) {
             apiUsageDTO.setConsumer(consumer);
         }
 

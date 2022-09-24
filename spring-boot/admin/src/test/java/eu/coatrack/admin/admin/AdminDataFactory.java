@@ -1,8 +1,8 @@
 package eu.coatrack.admin.admin;
 
+import eu.coatrack.admin.model.GeneralStats;
 import eu.coatrack.admin.model.vo.StatisticsPerApiUser;
 import eu.coatrack.admin.service.GatewayHealthMonitorService;
-import eu.coatrack.admin.service.admin.GeneralStats;
 import eu.coatrack.api.ApiKey;
 import eu.coatrack.api.ServiceApi;
 import eu.coatrack.api.User;

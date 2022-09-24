@@ -35,14 +35,12 @@ public class ApiUsageCounter {
         Long serviceId = apiUsageDTO.getService().getId();
         String ownerName = apiUsageDTO.getService().getOwner().getUsername();
         Long consumerId = apiUsageDTO.getConsumer() != null ? apiUsageDTO.getConsumer().getId() : -1L;
-
-        // TODO need to be LocalDate
         Date from = localDateToDate(apiUsageDTO.getFrom());
         Date until = localDateToDate(apiUsageDTO.getUntil());
 
 
-        List metricResults = metricsAggregationCustomRepository.getUsageApiConsumer(
-                RESPONSE, serviceId, ownerName, consumerId, from, until,true);
+        List metricResults = metricsAggregationCustomRepository.getUsageApiConsumer
+                (RESPONSE, serviceId, ownerName, consumerId, from, until, true);
 
         if (metricResults != null && !metricResults.isEmpty()) {
             metricResults.forEach(metricResult -> evaluateMetric(metricResult, apiUsageDTO, callCount));

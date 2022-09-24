@@ -8,9 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
-
-import static eu.coatrack.admin.utils.DateUtils.getMonthDifference;
 
 @Slf4j
 @Service
@@ -35,7 +34,7 @@ public class ApiUsageCalculator {
         }
 
         if (count.getMonthlyBilledCalls() > 0) {
-            int diffMonth = getMonthDifference(apiUsageDTO.getFrom(), apiUsageDTO.getUntil());
+            long diffMonth = ChronoUnit.MONTHS.between(apiUsageDTO.getFrom(), apiUsageDTO.getUntil());
             ApiUsageReport apiUsageReportForMonthlyFlatrate = new ApiUsageReport(
                     "All Calls",
                     count.getMonthlyBilledCalls(),
@@ -56,10 +55,5 @@ public class ApiUsageCalculator {
 
         apiUsageReports.forEach(reportRow -> log.debug("row for report: " + reportRow));
         return apiUsageReports;
-    }
-
-
-    public void setCounter(ApiUsageCounter counter) {
-        this.counter = counter;
     }
 }

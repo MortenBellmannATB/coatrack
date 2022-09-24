@@ -1,13 +1,12 @@
-package eu.coatrack.admin.controllers.admin;
+package eu.coatrack.admin.config;
 
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-@Component
 @Getter
-public class AdminConfig {
-
+@Component
+public class ValueConfig {
     @Value("${ygg.admin.gettingStarted.consumer.testService.provider.username}")
     private String gettingStartedTestServiceProvider;
 
@@ -16,4 +15,8 @@ public class AdminConfig {
 
     @Value("${ygg.admin.gettingStarted.consumer.testService.uriIdentifier}")
     private String gettingStartedTestServiceIdentifier;
+
+    @Value("${ygg.admin.server.url}")
+    private String coatrackAdminPublicServerURL;
+
 }

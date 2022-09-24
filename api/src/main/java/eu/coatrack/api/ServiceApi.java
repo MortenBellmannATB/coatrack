@@ -20,23 +20,23 @@ package eu.coatrack.api;
  * #L%
  */
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import javax.persistence.*;
+import javax.validation.constraints.Size;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  *
  * @author gr-hovest
  */
-@NoArgsConstructor
 @Getter
 @Setter
 @Entity
@@ -59,6 +59,7 @@ public class ServiceApi implements ServiceApiInterface{
     @Column(nullable = false)
     private String localUrl;
 
+    private double monthlyFee;
 
     @Enumerated(EnumType.STRING)
     private ServiceAccessPermissionPolicy serviceAccessPermissionPolicy;
@@ -80,13 +81,6 @@ public class ServiceApi implements ServiceApiInterface{
 
     @Temporal(javax.persistence.TemporalType.DATE)
     private Date deletedWhen;
-
-    private double monthlyFee;
-
-    @Override
-    public String getServiceOwnerUsername() {
-        return owner.getUsername();
-    }
 
     @Override
     public int hashCode() {
@@ -129,5 +123,10 @@ public class ServiceApi implements ServiceApiInterface{
                 + ", localUrl='" + localUrl + '\''
                 + ", user=" + owner
                 + '}';
+    }
+
+    @Override
+    public String getServiceOwnerUsername() {
+        return owner != null ? owner.getUsername() : null;
     }
 }
